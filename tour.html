@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>360° Virtual Tour — Color Wagon Rentals</title>
+  <meta name="description" content="Take an interactive 360° virtual tour of our campers before you book. Explore every corner of Gertrude and Violet." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Pannellum 360° viewer -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: #0d0d0d; }
+    .pnlm-container { background: #0d0d0d !important; }
+    .tour-controls {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem;
+      border-radius: 50px;
+    }
+    .tour-ctrl-btn {
+      padding: 0.5rem 1.1rem;
+      border-radius: 50px;
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.8rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+    }
+    .tour-ctrl-btn:hover, .tour-ctrl-btn.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+    .viewer-wrap { position: relative; }
+    .tour-loading {
+      position: absolute;
+      inset: 0;
+      background: #0d0d0d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 20;
+      transition: opacity 0.5s;
+    }
+    .tour-loading.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .scene-thumb-row {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 1.5rem;
+      background: #141414;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green) #1a1a1a;
+    }
+    .scene-thumb {
+      flex-shrink: 0;
+      width: 160px;
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .scene-thumb:hover { border-color: rgba(82,183,136,0.5); }
+    .scene-thumb.active { border-color: var(--green); }
+    .scene-thumb img { width: 100%; height: 90px; object-fit: cover; display: block; }
+    .scene-thumb-label {
+      background: #1e1e1e;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.78rem;
+      padding: 0.4rem 0.6rem;
+      font-weight: 500;
+    }
+    .scene-thumb.active .scene-thumb-label { color: var(--green-light); }
+    .tour-info-bar {
+      background: #1a1a1a;
+      padding: 1.5rem;
+      border-top: 1px solid #2a2a2a;
+    }
+    .tour-info-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .scene-description { color: rgba(255,255,255,0.65); font-size: 0.9rem; line-height: 1.6; }
+    .scene-title { color: white; font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .tour-book-box {
+      background: var(--green-dark);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      color: white;
+      min-width: 200px;
+    }
+    .tour-book-box p { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 0.75rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="mainNav" style="background:rgba(13,13,13,0.95);">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="color:white;">
+        <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" onerror="this.style.display='none'" />
+        Color Wagon Rentals
+      </a>
+      <ul class="nav-links" style="--link-color:rgba(255,255,255,0.8);">
+        <li><a href="index.html" style="color:rgba(255,255,255,0.8);">Home</a></li>
+        <li><a href="fleet.html" style="color:rgba(255,255,255,0.8);">Our Fleet</a></li>
+        <li><a href="tour.html" class="active" style="color:white;">Virtual Tour</a></li>
+        <li><a href="booking.html" style="color:rgba(255,255,255,0.8);">Book Now</a></li>
+        <li><a href="index.html#contact" style="color:rgba(255,255,255,0.8);">Contact</a></li>
+      </ul>
+      <a href="booking.html" class="btn btn-primary btn-sm nav-cta">Check Availability</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu" style="--span-color:white;">
+        <span style="background:white;"></span><span style="background:white;"></span><span style="background:white;"></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu" style="background:#1a1a1a;">
+    <a href="index.html" style="color:rgba(255,255,255,0.8);">Home</a>
+    <a href="fleet.html" style="color:rgba(255,255,255,0.8);">Our Fleet</a>
+    <a href="tour.html" style="color:white;">Virtual Tour</a>
+    <a href="booking.html" style="color:rgba(255,255,255,0.8);">Book Now</a>
+    <a href="index.html#contact" style="color:rgba(255,255,255,0.8);">Contact</a>
+    <a href="booking.html" class="btn btn-primary" style="justify-content:center; margin-top:0.5rem;">Check Availability</a>
+  </div>
+
+  <!-- Tour Header -->
+  <div style="background:#141414; padding:calc(var(--nav-height) + 1.5rem) 0 1.5rem; text-align:center;">
+    <div class="container">
+      <span class="section-label" style="color:var(--gold);">Interactive 360°</span>
+      <h1 style="color:white; margin-bottom:0.5rem;">Virtual Tour</h1>
+      <p style="color:rgba(255,255,255,0.6); margin-bottom:1.5rem;">Click and drag to explore every angle. Use the scene buttons below to move between areas.</p>
+      <div style="display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap; font-size:0.85rem; color:rgba(255,255,255,0.5);">
+        <span>&#128073; Click &amp; drag to look around</span>
+        <span>&#128073; Scroll to zoom</span>
+        <span>&#128073; Double-click hotspots to jump scenes</span>
+        <span>&#128073; Use fullscreen for best experience</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Viewer -->
+  <div class="viewer-wrap" style="position:relative;">
+    <div class="tour-loading" id="tourLoading">
+      <div class="spinner"></div>
+      <p style="color:rgba(255,255,255,0.6); font-size:0.9rem;">Loading panoramic view...</p>
+    </div>
+    <div id="panorama-viewer"></div>
+
+    <div class="tour-controls">
+      <button class="tour-ctrl-btn active" id="btn-auto" onclick="toggleAutoRotate()">&#9654; Auto Rotate</button>
+      <button class="tour-ctrl-btn" onclick="document.getElementById('panorama-viewer').querySelector('.pnlm-fullscreen-toggle').click()">&#x26F6; Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- Scene Thumbnails -->
+  <div class="scene-thumb-row" id="sceneThumbs">
+    <div class="scene-thumb active" onclick="switchScene('scene1')" id="thumb-scene1">
+      <img src="panopics/IMG_1907.jpeg" alt="Scene 1" />
+      <div class="scene-thumb-label">Scene 1 — Exterior</div>
+    </div>
+    <div class="scene-thumb" onclick="switchScene('scene2')" id="thumb-scene2">
+      <img src="panopics/IMG_1908.jpeg" alt="Scene 2" />
+      <div class="scene-thumb-label">Scene 2 — Interior</div>
+    </div>
+    <div class="scene-thumb" onclick="switchScene('scene3')" id="thumb-scene3">
+      <img src="panopics/IMG_1909.jpeg" alt="Scene 3" />
+      <div class="scene-thumb-label">Scene 3 — Living Space</div>
+    </div>
+    <div class="scene-thumb" onclick="switchScene('scene4')" id="thumb-scene4">
+      <img src="panopics/IMG_1910.jpeg" alt="Scene 4" />
+      <div class="scene-thumb-label">Scene 4 — Sleeping Area</div>
+    </div>
+  </div>
+
+  <!-- Scene Info & Book Box -->
+  <div class="tour-info-bar">
+    <div class="tour-info-grid">
+      <div>
+        <div class="scene-title" id="sceneTitle">Scene 1 — Exterior View</div>
+        <div class="scene-description" id="sceneDesc">
+          Get a full walkaround view of the camper. Notice the hand-painted exterior artwork that makes each Color Wagon unique. You can see the compact but capable size — easy to drive, easy to park.
+        </div>
+      </div>
+      <div class="tour-book-box">
+        <p>Love what you see?</p>
+        <a href="booking.html" class="btn btn-gold">Check Availability</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- What to Look For -->
+  <div style="background:#111; padding:3rem 0;">
+    <div class="container">
+      <div class="text-center" style="margin-bottom:2.5rem;">
+        <span class="section-label" style="color:var(--gold);">Explore the Details</span>
+        <h2 style="color:white;">What to Look For</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem;" id="featureHighlights">
+        <div style="background:#1a1a1a; border-radius:var(--radius); padding:1.5rem; text-align:center; cursor:pointer;" class="feature-highlight" data-scene="scene1">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">&#127758;</div>
+          <h4 style="color:white; margin-bottom:0.4rem; font-size:1rem;">Hand-Painted Exterior</h4>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Each camper is a rolling work of art. Click to view.</p>
+        </div>
+        <div style="background:#1a1a1a; border-radius:var(--radius); padding:1.5rem; text-align:center; cursor:pointer;" class="feature-highlight" data-scene="scene2">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">&#127968;</div>
+          <h4 style="color:white; margin-bottom:0.4rem; font-size:1rem;">Cozy Interior</h4>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Everything you need in a compact, thoughtful space.</p>
+        </div>
+        <div style="background:#1a1a1a; border-radius:var(--radius); padding:1.5rem; text-align:center; cursor:pointer;" class="feature-highlight" data-scene="scene3">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">&#127859;</div>
+          <h4 style="color:white; margin-bottom:0.4rem; font-size:1rem;">Kitchenette</h4>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Cook your own meals and save on the road.</p>
+        </div>
+        <div style="background:#1a1a1a; border-radius:var(--radius); padding:1.5rem; text-align:center; cursor:pointer;" class="feature-highlight" data-scene="scene4">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">&#128716;</div>
+          <h4 style="color:white; margin-bottom:0.4rem; font-size:1rem;">Sleeping Area</h4>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.85rounded;">Comfortable bed with linens included.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2>Seen Enough to Say Yes?</h2>
+      <p>Book your Color Wagon adventure before your dates fill up.</p>
+      <div class="btn-actions">
+        <a href="booking.html" class="btn btn-gold btn-lg">Book Now</a>
+        <a href="fleet.html" class="btn btn-white btn-lg">View Fleet Details</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+            <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" style="height:40px;" onerror="this.style.display='none'" />
+            Color Wagon Rentals
+          </a>
+          <p>Hand-painted campers for unforgettable Wisconsin adventures. Experience, Adventure &amp; Affordability — since 2018.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Instagram">&#128247;</a>
+            <a href="#" class="social-link" aria-label="Facebook">&#128241;</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="fleet.html">Our Fleet</a></li>
+            <li><a href="booking.html">Book a Camper</a></li>
+            <li><a href="index.html#contact">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <ul>
+            <li><a href="tel:9203201270">(920) 320-1270</a></li>
+            <li><a href="mailto:ColorWagonRentals@gmail.com">ColorWagonRentals@gmail.com</a></li>
+            <li><span style="color:rgba(255,255,255,0.5);">Manitowoc, WI</span></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Rental Agreement</a></li>
+            <li><a href="#">Accessibility</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Color Wagon Rentals — Manitowoc, WI. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    const scenes = {
+      scene1: {
+        title: 'Scene 1 — Exterior View',
+        desc: 'Get a full walkaround view of the camper. Notice the hand-painted exterior artwork that makes each Color Wagon unique. You can see the compact but capable size — easy to drive, easy to park.',
+        image: 'panopics/IMG_1907.jpeg',
+        hotspots: [
+          { pitch: -5, yaw: 30, type: 'scene', text: 'View Interior', sceneId: 'scene2', cssClass: 'pnlm-hotspot-base' }
+        ]
+      },
+      scene2: {
+        title: 'Scene 2 — Interior Living Area',
+        desc: 'Step inside and explore the cozy interior. Everything is thoughtfully arranged to maximize your comfort without feeling cramped. Natural light fills the space.',
+        image: 'panopics/IMG_1908.jpeg',
+        hotspots: [
+          { pitch: -10, yaw: -60, type: 'scene', text: 'View Kitchenette', sceneId: 'scene3' },
+          { pitch: -5, yaw: 120, type: 'scene', text: 'View Exterior', sceneId: 'scene1' }
+        ]
+      },
+      scene3: {
+        title: 'Scene 3 — Kitchenette & Storage',
+        desc: 'The built-in kitchenette gives you everything you need to cook on the road. Plenty of storage keeps your gear organized and off the floor.',
+        image: 'panopics/IMG_1909.jpeg',
+        hotspots: [
+          { pitch: -5, yaw: 80, type: 'scene', text: 'View Sleeping Area', sceneId: 'scene4' },
+          { pitch: -5, yaw: -100, type: 'scene', text: 'Back to Living Area', sceneId: 'scene2' }
+        ]
+      },
+      scene4: {
+        title: 'Scene 4 — Sleeping Area',
+        desc: 'The cozy sleeping nook fits two people comfortably. Bedding and linens are included with every rental — pack light and arrive ready to rest after a day of adventure.',
+        image: 'panopics/IMG_1910.jpeg',
+        hotspots: [
+          { pitch: -5, yaw: -90, type: 'scene', text: 'Back to Kitchen', sceneId: 'scene3' }
+        ]
+      }
+    };
+
+    let viewer = null;
+    let autoRotateOn = true;
+    let currentScene = 'scene1';
+
+    function buildPannellumConfig() {
+      const cfg = {
+        default: {
+          firstScene: 'scene1',
+          sceneFadeDuration: 600,
+          autoLoad: true,
+          autoRotate: -2,
+          hfov: 110,
+          showControls: true,
+          showZoomCtrl: true,
+          showFullscreenCtrl: true,
+          compass: false,
+        },
+        scenes: {}
+      };
+      for (const [id, s] of Object.entries(scenes)) {
+        cfg.scenes[id] = {
+          title: s.title,
+          panorama: s.image,
+          hotSpots: s.hotspots.map(h => ({
+            pitch: h.pitch,
+            yaw: h.yaw,
+            type: h.type,
+            text: h.text,
+            sceneId: h.sceneId,
+            cssClass: 'custom-hotspot'
+          }))
+        };
+      }
+      return cfg;
+    }
+
+    function initViewer() {
+      try {
+        const config = buildPannellumConfig();
+        viewer = pannellum.viewer('panorama-viewer', config);
+        viewer.on('load', () => {
+          setTimeout(() => {
+            const loader = document.getElementById('tourLoading');
+            if (loader) loader.classList.add('hidden');
+          }, 300);
+        });
+        viewer.on('scenechange', (id) => {
+          currentScene = id;
+          updateSceneInfo(id);
+          updateThumbs(id);
+        });
+      } catch(e) {
+        console.warn('Pannellum init error:', e);
+        document.getElementById('tourLoading').classList.add('hidden');
+      }
+    }
+
+    function switchScene(sceneId) {
+      currentScene = sceneId;
+      if (viewer) {
+        try { viewer.loadScene(sceneId); } catch(e) {}
+      }
+      updateSceneInfo(sceneId);
+      updateThumbs(sceneId);
+    }
+
+    function updateSceneInfo(sceneId) {
+      const s = scenes[sceneId];
+      if (!s) return;
+      document.getElementById('sceneTitle').textContent = s.title;
+      document.getElementById('sceneDesc').textContent = s.desc;
+    }
+
+    function updateThumbs(sceneId) {
+      document.querySelectorAll('.scene-thumb').forEach(t => {
+        t.classList.toggle('active', t.id === 'thumb-' + sceneId);
+      });
+    }
+
+    function toggleAutoRotate() {
+      autoRotateOn = !autoRotateOn;
+      const btn = document.getElementById('btn-auto');
+      if (viewer) {
+        try {
+          if (autoRotateOn) { viewer.startAutoRotate(); btn.classList.add('active'); btn.textContent = '⏸ Auto Rotate'; }
+          else { viewer.stopAutoRotate(); btn.classList.remove('active'); btn.textContent = '▶ Auto Rotate'; }
+        } catch(e) {}
+      }
+    }
+
+    // Feature highlight click
+    document.querySelectorAll('.feature-highlight').forEach(el => {
+      el.addEventListener('click', () => switchScene(el.dataset.scene));
+    });
+
+    // URL param scene
+    const urlParams = new URLSearchParams(window.location.search);
+    const startScene = urlParams.get('scene');
+    if (startScene && scenes['scene' + startScene]) {
+      currentScene = 'scene' + startScene;
+    }
+
+    window.addEventListener('load', initViewer);
+  </script>
+</body>
+</html>
