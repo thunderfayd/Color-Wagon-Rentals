@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Fleet — Color Wagon Rentals</title>
+  <meta name="description" content="Meet Gertrude, Violet, and our Delivery Trailer. Three unique campers ready for your Wisconsin adventure." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav scrolled" id="mainNav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" onerror="this.style.display='none'" />
+        Color Wagon Rentals
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="fleet.html" class="active">Our Fleet</a></li>
+        <li><a href="tour.html">Virtual Tour</a></li>
+        <li><a href="booking.html">Book Now</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+      <a href="booking.html" class="btn btn-primary btn-sm nav-cta">Check Availability</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="tour.html">Virtual Tour</a>
+    <a href="booking.html">Book Now</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="booking.html" class="btn btn-primary" style="justify-content:center; margin-top:0.5rem;">Check Availability</a>
+  </div>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="section-label" style="color:var(--gold);">The Fleet</span>
+      <h1>Meet Our Campers</h1>
+      <p>Three unique personalities, one shared mission: putting you on the open road.</p>
+    </div>
+  </div>
+
+  <!-- Fleet Nav Pills -->
+  <div style="background:var(--white); border-bottom:1px solid #E5E7EB; position:sticky; top:var(--nav-height); z-index:100;">
+    <div class="container" style="display:flex; gap:1rem; padding-top:1rem; padding-bottom:1rem; overflow-x:auto;">
+      <a href="#gertrude" class="btn btn-sm btn-secondary">Gertrude</a>
+      <a href="#violet" class="btn btn-sm btn-secondary">Violet</a>
+      <a href="#trailer" class="btn btn-sm btn-secondary">The Trailer</a>
+      <a href="#pricing" class="btn btn-sm btn-secondary">Pricing</a>
+      <a href="#policies" class="btn btn-sm btn-secondary">Policies</a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Gertrude -->
+    <div class="unit-detail" id="gertrude">
+      <div class="unit-gallery">
+        <div class="unit-gallery-main">
+          <img src="colorwagonrentals/CW Bed.jpg" alt="Gertrude Interior" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Gertrude Exterior" style="border-radius:var(--radius); height:150px; object-fit:cover; width:100%;" />
+          <div style="border-radius:var(--radius); height:150px; background:linear-gradient(135deg,var(--green),var(--green-light)); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#127794;</div>
+        </div>
+      </div>
+      <div class="unit-info">
+        <div class="unit-info-header">
+          <div class="unit-name">Gertrude</div>
+          <div class="unit-tagline">&#9728;&#65039; Classic, Cozy &amp; Off-Grid Ready</div>
+          <p>Gertrude is our most beloved camper — a true classic with a hand-painted exterior that turns heads at every campsite. She's built for two people who want to go wherever the road leads, with everything you need and nothing you don't.</p>
+        </div>
+        <div class="unit-features">
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Sleeps 2 comfortably
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Solar power system
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Built-in kitchenette
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Bedding &amp; linens included
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>700 miles per week
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Truly off-grid capable
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Hand-painted one-of-a-kind design
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Full trip orientation included
+          </div>
+        </div>
+        <div class="pricing-box" id="pricing">
+          <h4>Gertrude Pricing</h4>
+          <div class="pricing-row">
+            <span>Weekly Rate (7 nights)</span>
+            <span>$650</span>
+          </div>
+          <div class="pricing-row">
+            <span>Miles Included</span>
+            <span>700 miles</span>
+          </div>
+          <div class="pricing-row">
+            <span>Overage Mileage</span>
+            <span>Contact for rate</span>
+          </div>
+          <div class="pricing-row">
+            <span>Security Deposit</span>
+            <span>Required (refundable)</span>
+          </div>
+          <div class="pricing-row">
+            <span>Weekend / Shorter Rentals</span>
+            <span>Contact us</span>
+          </div>
+        </div>
+        <div class="unit-actions">
+          <a href="booking.html?unit=gertrude" class="btn btn-primary btn-lg">Book Gertrude</a>
+          <a href="tour.html" class="btn btn-secondary btn-lg">&#127981; Virtual Tour</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Violet -->
+    <div class="unit-detail reverse" id="violet">
+      <div class="unit-gallery">
+        <div class="unit-gallery-main" style="background:linear-gradient(135deg, #6B21A8, #9333EA);">
+          <img src="colorwagonrentals/Screen Shot 2026-04-11 at 7.37.53 PM.png" alt="Violet Camper" style="width:100%; height:360px; object-fit:cover;" onerror="this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.style.fontSize='6rem'; this.parentElement.innerHTML='&#128519;';" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+          <div style="border-radius:var(--radius); height:150px; background:linear-gradient(135deg,#7E22CE,#A855F7); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#128519;</div>
+          <div style="border-radius:var(--radius); height:150px; background:linear-gradient(135deg,#4C1D95,#7C3AED); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#127986;</div>
+        </div>
+      </div>
+      <div class="unit-info">
+        <div class="unit-info-header">
+          <div class="unit-name">Violet</div>
+          <div class="unit-tagline">&#128519; Bright, Bold &amp; Impossible to Miss</div>
+          <p>Violet is our newer model — a vibrant, brightly colored camper with a clean, straightforward layout perfect for couples or solo adventurers. You will never lose her in a crowded parking lot, and you'll make new friends at every stop.</p>
+        </div>
+        <div class="unit-features">
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Sleeps 2
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Bright, bold color exterior
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Easy to drive layout
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Bedding &amp; linens included
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>700 miles per week
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Newer model
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Great for adventuring
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Full trip orientation included
+          </div>
+        </div>
+        <div class="pricing-box">
+          <h4>Violet Pricing</h4>
+          <div class="pricing-row">
+            <span>Weekly Rate (7 nights)</span>
+            <span>$650</span>
+          </div>
+          <div class="pricing-row">
+            <span>Miles Included</span>
+            <span>700 miles</span>
+          </div>
+          <div class="pricing-row">
+            <span>Overage Mileage</span>
+            <span>Contact for rate</span>
+          </div>
+          <div class="pricing-row">
+            <span>Security Deposit</span>
+            <span>Required (refundable)</span>
+          </div>
+          <div class="pricing-row">
+            <span>Weekend / Shorter Rentals</span>
+            <span>Contact us</span>
+          </div>
+        </div>
+        <div class="unit-actions">
+          <a href="booking.html?unit=violet" class="btn btn-primary btn-lg">Book Violet</a>
+          <a href="tour.html" class="btn btn-secondary btn-lg">&#127981; Virtual Tour</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Trailer -->
+    <div class="unit-detail" id="trailer">
+      <div class="unit-gallery">
+        <div class="unit-gallery-main">
+          <img src="colorwagonrentals/Ludington Flyer.jpg" alt="The Delivery Trailer" style="width:100%; height:360px; object-fit:cover;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+          <div style="border-radius:var(--radius); height:150px; background:linear-gradient(135deg,#92400E,#D97706); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#127968;</div>
+          <div style="border-radius:var(--radius); height:150px; background:linear-gradient(135deg,#78350F,#B45309); display:flex; align-items:center; justify-content:center; font-size:3rem;">&#127806;</div>
+        </div>
+      </div>
+      <div class="unit-info">
+        <div class="unit-info-header">
+          <div class="unit-name">The Trailer</div>
+          <div class="unit-tagline">&#128106; Family-Sized — Delivered to Your Site</div>
+          <p>Our largest option, The Trailer sleeps up to 6 people and is perfect for families or friend groups who want a true base camp experience. Unlike our other units, this one is a delivery-only option — we bring it to you.</p>
+          <div style="background:#FEF3C7; border:1px solid #F59E0B; border-radius:var(--radius); padding:1rem; margin-top:1rem; font-size:0.9rem; color:#92400E;">
+            <strong>&#128230; Delivery Only:</strong> The Trailer is available for delivery within 30 miles of Crivitz, Wisconsin. We set it up at your campsite so you can focus on fun.
+          </div>
+        </div>
+        <div class="unit-features">
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Sleeps up to 6 people
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Delivery included (within 30 mi)
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Perfect for families
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Setup &amp; breakdown by us
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Spacious interior
+          </div>
+          <div class="unit-feature">
+            <div class="feature-check">&#10003;</div>Near Crivitz, WI area
+          </div>
+        </div>
+        <div class="pricing-box">
+          <h4>Trailer Pricing</h4>
+          <div class="pricing-row">
+            <span>Rental Rate</span>
+            <span>Contact for quote</span>
+          </div>
+          <div class="pricing-row">
+            <span>Delivery Area</span>
+            <span>Within 30 mi of Crivitz, WI</span>
+          </div>
+          <div class="pricing-row">
+            <span>Setup &amp; Breakdown</span>
+            <span>Included</span>
+          </div>
+          <div class="pricing-row">
+            <span>Minimum Stay</span>
+            <span>Contact us</span>
+          </div>
+        </div>
+        <div class="unit-actions">
+          <a href="index.html#contact" class="btn btn-coral btn-lg">Inquire About Trailer</a>
+          <a href="booking.html?unit=trailer" class="btn btn-secondary btn-lg">Request Dates</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- Rental Policies -->
+  <section class="section" style="background:var(--light-gray);" id="policies">
+    <div class="container">
+      <div class="text-center" style="margin-bottom:3rem;">
+        <span class="section-label">Good to Know</span>
+        <h2 class="section-title">Rental Policies &amp; Requirements</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:2rem;">
+        <div style="background:var(--white); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-sm);">
+          <div style="font-size:2rem; margin-bottom:1rem;">&#128203;</div>
+          <h4 style="margin-bottom:1rem;">Driver Requirements</h4>
+          <div class="req-list">
+            <div class="req-item"><div class="req-icon">&#10003;</div>Valid driver's license required</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Must be 25 years or older</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Clean driving record preferred</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>License provided at pickup</div>
+          </div>
+        </div>
+        <div style="background:var(--white); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-sm);">
+          <div style="font-size:2rem; margin-bottom:1rem;">&#128176;</div>
+          <h4 style="margin-bottom:1rem;">Payment &amp; Deposit</h4>
+          <div class="req-list">
+            <div class="req-item"><div class="req-icon">&#10003;</div>Deposit required to confirm booking</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Balance due at pickup</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Refundable security deposit held</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Contact us for payment details</div>
+          </div>
+        </div>
+        <div style="background:var(--white); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-sm);">
+          <div style="font-size:2rem; margin-bottom:1rem;">&#128683;</div>
+          <h4 style="margin-bottom:1rem;">Prohibited &amp; Policies</h4>
+          <div class="req-list">
+            <div class="req-item"><div class="req-icon">&#10003;</div>No smoking inside the camper</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>No pets (unless pre-approved)</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Return with full fuel tank</div>
+            <div class="req-item"><div class="req-icon">&#10003;</div>Treat it like your own home</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--white); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-sm); margin-top:2rem; text-align:center;">
+        <p style="color:var(--gray); margin-bottom:1rem;">Have specific questions about policies, mileage overages, or special situations? We're a small family business and happy to chat.</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+          <a href="tel:9203201270" class="btn btn-primary">&#128222; Call (920) 320-1270</a>
+          <a href="mailto:ColorWagonRentals@gmail.com" class="btn btn-secondary">&#128140; Email Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2>Ready to Pick Your Wagon?</h2>
+      <p>Check the calendar and book your dates before they fill up.</p>
+      <div class="btn-actions">
+        <a href="booking.html" class="btn btn-gold btn-lg">Check Availability</a>
+        <a href="tour.html" class="btn btn-white btn-lg">&#127981; Take the Tour</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-logo">
+            <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" style="height:40px;" onerror="this.style.display='none'" />
+            Color Wagon Rentals
+          </a>
+          <p>Hand-painted campers for unforgettable Wisconsin adventures. Experience, Adventure &amp; Affordability — since 2018.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Instagram">&#128247;</a>
+            <a href="#" class="social-link" aria-label="Facebook">&#128241;</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Our Fleet</h5>
+          <ul>
+            <li><a href="#gertrude">Gertrude</a></li>
+            <li><a href="#violet">Violet</a></li>
+            <li><a href="#trailer">The Trailer</a></li>
+            <li><a href="tour.html">Virtual Tour</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Booking</h5>
+          <ul>
+            <li><a href="booking.html">Check Availability</a></li>
+            <li><a href="booking.html">Book a Camper</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#policies">Rental Policies</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <ul>
+            <li><a href="tel:9203201270">(920) 320-1270</a></li>
+            <li><a href="mailto:ColorWagonRentals@gmail.com">ColorWagonRentals@gmail.com</a></li>
+            <li><a href="index.html#contact">Send a Message</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Color Wagon Rentals — Manitowoc, WI. All rights reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Rental Agreement</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
