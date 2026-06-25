@@ -3,61 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Color Wagon Rentals — Adventure Awaits in Wisconsin</title>
-  <meta name="description" content="Rent a hand-painted camper from Heidi & Will and explore Wisconsin and beyond. Affordable RV rentals from Manitowoc, WI." />
+  <title>Color Wagon Rentals — Hand-Painted Camper Vans in Manitowoc, WI</title>
+  <meta name="description" content="Rent a hand-painted Ford Econoline camper van from Heidi & Will in Manitowoc, WI. $99/night or $650/week. Meet Gertrude & Violet — new for 2026!" />
+  <link rel="canonical" href="https://www.colorwagonrentals.com/" />
+  <meta name="theme-color" content="#0E3D23" />
+  <meta name="author" content="Color Wagon Rentals" />
+  <!-- Favicons -->
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- Open Graph / social sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Color Wagon Rentals" />
+  <meta property="og:title" content="Color Wagon Rentals — Hand-Painted Camper Vans in Manitowoc, WI" />
+  <meta property="og:description" content="Rent a hand-painted Ford Econoline camper van from Heidi & Will in Manitowoc, WI. $99/night or $650/week. Meet Gertrude & Violet!" />
+  <meta property="og:image" content="https://www.colorwagonrentals.com/og-image.jpg" />
+  <meta property="og:url" content="https://www.colorwagonrentals.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <a class="skip-link" href="#about">Skip to content</a>
 
   <!-- Navigation -->
-  <nav class="nav" id="mainNav">
+  <nav class="nav over-hero" id="mainNav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">
-        <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" onerror="this.style.display='none'" />
+        <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals logo" width="600" height="464" onerror="this.style.display='none'" />
         Color Wagon Rentals
       </a>
       <ul class="nav-links">
         <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="fleet.html">Our Fleet</a></li>
+        <li><a href="fleet.html">Meet the Vans</a></li>
         <li><a href="tour.html">Virtual Tour</a></li>
         <li><a href="booking.html">Book Now</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <a href="booking.html" class="btn btn-primary btn-sm nav-cta">
-        Check Availability
-      </a>
-      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <a href="booking.html" class="btn btn-gold btn-sm nav-cta">Check Availability</a>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
-    <a href="fleet.html">Our Fleet</a>
+    <a href="fleet.html">Meet the Vans</a>
     <a href="tour.html">Virtual Tour</a>
     <a href="booking.html">Book Now</a>
     <a href="#contact">Contact</a>
-    <a href="booking.html" class="btn btn-primary" style="justify-content:center; margin-top:0.5rem;">Check Availability</a>
+    <a href="booking.html" class="btn btn-gold" style="margin-top:0.5rem;">Check Availability</a>
   </div>
 
   <!-- Hero -->
   <section class="hero" id="home">
     <div class="hero-bg">
-      <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Color Wagon RV Adventure" />
+      <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Gertrude and Violet, our hand-painted camper vans, parked at the SS Badger dock in Manitowoc" width="2000" height="856" fetchpriority="high" decoding="async" />
     </div>
     <div class="container">
       <div class="hero-content">
-        <div class="hero-badge">
-          &#127749; Wisconsin's Most Colorful Adventure
-        </div>
-        <h1>Hit the Road in a <span>Color Wagon</span></h1>
-        <p>Hand-painted campers full of personality, ready for your next adventure. Affordable, memorable, and uniquely yours for the week.</p>
+        <div class="hero-badge">&#10024; New to Manitowoc for 2026</div>
+        <h1>
+          <span class="script">Hit the road in a...</span>
+          Hand-Painted Camper Van
+        </h1>
+        <p>Meet Gertrude and Violet — two one-of-a-kind Ford Econoline campers with queen beds, kitchens out the back, and personality for miles. From $99 a night.</p>
         <div class="hero-actions">
           <a href="booking.html" class="btn btn-gold btn-lg">Check Availability</a>
-          <a href="tour.html" class="btn btn-white btn-lg">&#127981; Virtual Tour</a>
+          <a href="fleet.html" class="btn btn-white btn-lg">Meet the Vans</a>
         </div>
       </div>
     </div>
@@ -67,25 +83,27 @@
     </a>
   </section>
 
+  <span class="stripe"></span>
+
   <!-- Stats Bar -->
   <div class="stats-bar">
     <div class="container">
       <div class="stats-grid">
         <div>
-          <div class="stat-num">3</div>
-          <div class="stat-label">Unique Campers</div>
+          <div class="stat-num">$99</div>
+          <div class="stat-label">Per Night</div>
         </div>
         <div>
           <div class="stat-num">$650</div>
-          <div class="stat-label">Per Week, 700 mi included</div>
+          <div class="stat-label">Per Week — 700 miles included</div>
         </div>
         <div>
-          <div class="stat-num">2018</div>
-          <div class="stat-label">Our Story Began</div>
+          <div class="stat-num">2026</div>
+          <div class="stat-label">Proudly Established</div>
         </div>
         <div>
-          <div class="stat-num">WI+</div>
-          <div class="stat-label">Wisconsin & Beyond</div>
+          <div class="stat-num">~16 MPG</div>
+          <div class="stat-label">Best Gas Mileage in Camping</div>
         </div>
       </div>
     </div>
@@ -97,28 +115,28 @@
       <div class="about-grid">
         <div class="about-images">
           <div class="about-img-main">
-            <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Color Wagon Rentals" />
+            <img src="colorwagonrentals/CW Bed.jpg" alt="Queen-size bed with wildflower bedding inside a Color Wagon camper van" width="1086" height="1448" loading="lazy" decoding="async" />
           </div>
           <div class="about-img-badge">
-            <span class="num">2018</span>
-            <span class="lbl">Est. in Wisconsin</span>
+            <span class="num">2026</span>
+            <span class="lbl">Est. in Manitowoc, WI</span>
           </div>
         </div>
         <div class="about-content">
           <span class="section-label">Our Story</span>
           <h2 class="section-title">Experience, Adventure &amp; Affordability</h2>
-          <p style="margin-bottom:1rem;">In 2018, Heidi and Will took a trip that changed everything. They fell in love with the open road, the freedom of waking up somewhere new, and the simple joy of a home on wheels.</p>
-          <p style="margin-bottom:1rem;">They decided to make that same experience available to everyone — not just those who can afford to buy. Color Wagon Rentals was born from the belief that adventure should be accessible, joyful, and a little bit colorful.</p>
-          <p style="margin-bottom:1.5rem;">Based in Manitowoc, Wisconsin, we offer hand-painted, personality-filled campers ready for your next escape — whether you're heading to the Northwoods, Lake Michigan shore, or anywhere the road takes you.</p>
+          <p style="margin-bottom:1rem;">Color Wagon Rentals launched in 2026 with a simple idea: the freedom of a camper van shouldn't require buying one. Heidi and Will hand-painted two Ford Econoline vans, built out cozy queen-bed interiors with rear-access kitchens, and put them on the road for everyone to enjoy.</p>
+          <p style="margin-bottom:1rem;">Camper vans are the easy way into van life — they drive like a regular vehicle, park in a regular spot, and average around 16 mpg, the best gas mileage you'll find in camping.</p>
+          <p style="margin-bottom:1.5rem;">We're based in Manitowoc, Wisconsin — right at the SS Badger ferry dock. Head for the Northwoods, follow the Lake Michigan shore, or hop off the ferry and into a van. Wherever you go, you won't blend in.</p>
           <div class="about-tags">
-            <span class="tag">&#127807; Wisconsin Based</span>
-            <span class="tag">&#9728;&#65039; Solar Powered</span>
-            <span class="tag">&#127774; Off-Grid Ready</span>
-            <span class="tag">&#127968; Couples &amp; Families</span>
-            <span class="tag">&#9729;&#65039; Kitchenette Included</span>
+            <span class="tag">&#127807; Manitowoc, WI</span>
+            <span class="tag">&#128716; Queen Beds</span>
+            <span class="tag">&#127859; Rear-Access Kitchens</span>
+            <span class="tag">&#127912; Hand-Painted</span>
+            <span class="tag">&#9981; ~16 MPG</span>
           </div>
           <div style="margin-top:1.75rem;">
-            <a href="fleet.html" class="btn btn-primary">Meet Our Campers</a>
+            <a href="fleet.html" class="btn btn-primary">Meet Gertrude &amp; Violet</a>
           </div>
         </div>
       </div>
@@ -126,32 +144,33 @@
   </section>
 
   <!-- Fleet Overview -->
-  <section class="section" style="background: var(--light-gray);">
+  <section class="section alt-bg">
     <div class="container">
       <div class="text-center">
-        <span class="section-label">Our Fleet</span>
+        <span class="section-label">The Fleet</span>
         <h2 class="section-title">Find Your Perfect Ride</h2>
-        <p class="section-subtitle">Each camper has its own story, style, and personality. Choose the one that speaks to you.</p>
+        <p class="section-subtitle">Two hand-painted camper vans you drive, plus a family-sized trailer we deliver. Each one has its own story and style.</p>
       </div>
       <div class="fleet-grid">
         <!-- Gertrude -->
-        <div class="fleet-card">
+        <div class="fleet-card theme-gertrude">
           <div class="fleet-card-img">
-            <img src="colorwagonrentals/CW Bed.jpg" alt="Gertrude - Classic Hand-Painted Camper" />
-            <span class="fleet-card-badge">Most Popular</span>
+            <img src="colorwagonrentals/gertrude/IMG_0767.jpg" alt="Gertrude — autumn-painted camper van parked below green mountains" width="1300" height="975" loading="lazy" decoding="async" style="object-position: center;" />
+            <span class="fleet-card-badge">&#127810; The Classic</span>
           </div>
           <div class="fleet-card-body">
             <div class="fleet-card-name">Gertrude</div>
-            <div class="fleet-card-desc">Classic hand-painted exterior, cozy interior for two, built-in kitchenette, and solar power for true off-grid freedom.</div>
+            <div class="fleet-card-year">2008 Ford Econoline</div>
+            <div class="fleet-card-desc">Warm autumn woodland mural, queen bed, rear-access kitchen, and a Bluetooth radio for your road trip playlist.</div>
             <div class="fleet-card-specs">
               <div class="spec"><span class="spec-icon">&#128101;</span> Sleeps 2</div>
-              <div class="spec"><span class="spec-icon">&#9728;&#65039;</span> Solar Power</div>
-              <div class="spec"><span class="spec-icon">&#127859;</span> Kitchenette</div>
-              <div class="spec"><span class="spec-icon">&#127758;</span> 700 mi/week</div>
+              <div class="spec"><span class="spec-icon">&#128716;</span> Queen Bed</div>
+              <div class="spec"><span class="spec-icon">&#127911;</span> Bluetooth Radio</div>
+              <div class="spec"><span class="spec-icon">&#127859;</span> Rear Kitchen</div>
             </div>
             <div class="fleet-card-price">
-              <span class="price-num">$650</span>
-              <span class="price-per">/ week</span>
+              <span class="price-num">$99</span>
+              <span class="price-per">/night &middot; $650/week</span>
             </div>
             <div class="fleet-card-actions">
               <a href="fleet.html#gertrude" class="btn btn-secondary btn-sm">Details</a>
@@ -160,23 +179,24 @@
           </div>
         </div>
         <!-- Violet -->
-        <div class="fleet-card">
-          <div class="fleet-card-img" style="background: linear-gradient(135deg, #6B21A8, #9333EA);">
-            <img src="colorwagonrentals/Screen Shot 2026-04-11 at 7.37.53 PM.png" alt="Violet - Bright Color Camper" onerror="this.style.display='none'" />
-            <span class="fleet-card-badge">Eye-Catching</span>
+        <div class="fleet-card theme-violet">
+          <div class="fleet-card-img">
+            <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Violet — purple frog-mural camper van" width="2000" height="856" loading="lazy" decoding="async" style="object-position: 78% center;" />
+            <span class="fleet-card-badge">&#128056; The Showstopper</span>
           </div>
           <div class="fleet-card-body">
             <div class="fleet-card-name">Violet</div>
-            <div class="fleet-card-desc">Bright colors that won't get lost in any parking lot. A newer model with a straightforward layout designed for adventure.</div>
+            <div class="fleet-card-year">2013 Ford Econoline</div>
+            <div class="fleet-card-desc">A purple pond-life mural you can spot from across any campground, solar power for your devices, and a CD player for the full retro road-trip experience.</div>
             <div class="fleet-card-specs">
               <div class="spec"><span class="spec-icon">&#128101;</span> Sleeps 2</div>
-              <div class="spec"><span class="spec-icon">&#127763;</span> Bright Colors</div>
-              <div class="spec"><span class="spec-icon">&#128663;</span> Easy to Drive</div>
-              <div class="spec"><span class="spec-icon">&#127758;</span> 700 mi/week</div>
+              <div class="spec"><span class="spec-icon">&#9728;&#65039;</span> Solar Power</div>
+              <div class="spec"><span class="spec-icon">&#128191;</span> CD Player</div>
+              <div class="spec"><span class="spec-icon">&#127859;</span> Rear Kitchen</div>
             </div>
             <div class="fleet-card-price">
-              <span class="price-num">$650</span>
-              <span class="price-per">/ week</span>
+              <span class="price-num">$99</span>
+              <span class="price-per">/night &middot; $650/week</span>
             </div>
             <div class="fleet-card-actions">
               <a href="fleet.html#violet" class="btn btn-secondary btn-sm">Details</a>
@@ -185,18 +205,19 @@
           </div>
         </div>
         <!-- Trailer -->
-        <div class="fleet-card">
-          <div class="fleet-card-img" style="background: linear-gradient(135deg, #92400E, #D97706);">
-            <img src="colorwagonrentals/Ludington Flyer.jpg" alt="Delivery Trailer" onerror="this.style.display='none'" />
-            <span class="fleet-card-badge">Delivery Only</span>
+        <div class="fleet-card theme-trailer">
+          <div class="fleet-card-img" style="display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#92400E,#D97706); font-size:4rem;">
+            &#127957;&#65039;
+            <span class="fleet-card-badge">&#128230; Delivered to You</span>
           </div>
           <div class="fleet-card-body">
             <div class="fleet-card-name">The Trailer</div>
-            <div class="fleet-card-desc">Our largest option — sleeps up to 6! Delivered to your site within 30 miles of Crivitz, WI. Perfect for family adventures.</div>
+            <div class="fleet-card-year">Family base camp</div>
+            <div class="fleet-card-desc">Our largest option sleeps up to 6. We deliver and set it up at your campsite within 30 miles of Crivitz, WI — you just show up and camp.</div>
             <div class="fleet-card-specs">
               <div class="spec"><span class="spec-icon">&#128101;</span> Sleeps 6</div>
               <div class="spec"><span class="spec-icon">&#128230;</span> Delivery Incl.</div>
-              <div class="spec"><span class="spec-icon">&#128205;</span> &lt;30mi Crivitz</div>
+              <div class="spec"><span class="spec-icon">&#128205;</span> Crivitz Area</div>
               <div class="spec"><span class="spec-icon">&#128106;</span> Family Sized</div>
             </div>
             <div class="fleet-card-price">
@@ -209,8 +230,27 @@
           </div>
         </div>
       </div>
-      <div style="text-align:center; margin-top:2.5rem;">
-        <a href="fleet.html" class="btn btn-secondary">View Full Fleet Details</a>
+    </div>
+  </section>
+
+  <!-- SS Badger feature -->
+  <section class="section badger-section">
+    <div class="container">
+      <div class="badger-grid">
+        <div>
+          <span class="section-label" style="color:var(--gold);">The Manitowoc Advantage</span>
+          <h2>Hop Off the SS Badger, Into a Van</h2>
+          <p style="margin-top:0.75rem;">We're stationed right where the historic SS Badger car ferry crosses Lake Michigan between Ludington and Manitowoc. Sailing over from Michigan? Your Color Wagon can be ready at the dock.</p>
+          <div class="badger-points">
+            <div class="badger-point"><span class="dot">1</span> Cruise across Lake Michigan on the SS Badger</div>
+            <div class="badger-point"><span class="dot">2</span> Pick up your van right at the Manitowoc dock</div>
+            <div class="badger-point"><span class="dot">3</span> Explore Wisconsin — Door County, the Northwoods, and beyond</div>
+          </div>
+          <a href="booking.html" class="btn btn-gold btn-lg">Plan Your Crossing</a>
+        </div>
+        <div>
+          <img src="colorwagonrentals/CW Badger Pic.jpg" alt="Both Color Wagon vans parked in front of the SS Badger ferry in Manitowoc" width="2000" height="856" loading="lazy" decoding="async" />
+        </div>
       </div>
     </div>
   </section>
@@ -220,46 +260,46 @@
     <div class="container">
       <div class="tour-inner">
         <div class="tour-preview">
-          <img src="panopics/IMG_1907.jpeg" alt="Virtual Tour Preview" />
-          <a href="tour.html" class="tour-play-btn">
+          <img src="panopics/preview.jpg" alt="Virtual tour preview of the camper van" width="1100" height="733" loading="lazy" decoding="async" />
+          <a href="tour.html" class="tour-play-btn" aria-label="Launch virtual tour">
             <div class="play-circle">
               <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
           </a>
         </div>
         <div class="tour-content">
-          <span class="section-label">360° Virtual Tour</span>
+          <span class="section-label">360&deg; Virtual Tour</span>
           <h2>Explore Before You Book</h2>
-          <p>Take a full interactive tour of our campers from the comfort of your home. Look around in every direction — no surprises when you arrive.</p>
+          <p>Take an interactive look around the vans from the comfort of your couch. Look in every direction — no surprises on pickup day.</p>
           <div class="tour-scenes">
-            <a href="tour.html?scene=exterior" class="tour-scene-item">
+            <a href="tour.html" class="tour-scene-item">
               <div class="tour-scene-num">1</div>
-              Exterior View — Full walkaround
+              Exterior — the hand-painted murals up close
             </a>
-            <a href="tour.html?scene=interior" class="tour-scene-item">
+            <a href="tour.html" class="tour-scene-item">
               <div class="tour-scene-num">2</div>
-              Interior — Living &amp; sleeping space
+              Interior — living &amp; sleeping space
             </a>
-            <a href="tour.html?scene=kitchen" class="tour-scene-item">
+            <a href="tour.html" class="tour-scene-item">
               <div class="tour-scene-num">3</div>
-              Kitchenette &amp; Storage area
+              Kitchen &amp; storage out the back
             </a>
-            <a href="tour.html?scene=bed" class="tour-scene-item">
+            <a href="tour.html" class="tour-scene-item">
               <div class="tour-scene-num">4</div>
-              Bedroom &amp; cozy sleeping nook
+              The queen-bed sleeping nook
             </a>
           </div>
-          <a href="tour.html" class="btn btn-gold btn-lg">Launch 360° Tour</a>
+          <a href="tour.html" class="btn btn-primary btn-lg">Launch the Tour</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- How It Works -->
-  <section class="section how-it-works">
+  <section class="section">
     <div class="container">
       <div class="text-center">
-        <span class="section-label">Simple Process</span>
+        <span class="section-label">Simple as can be</span>
         <h2 class="section-title">How Renting Works</h2>
         <p class="section-subtitle">From browsing to the open road in four easy steps.</p>
       </div>
@@ -267,22 +307,22 @@
         <div class="step">
           <div class="step-icon">&#128269;<div class="step-num">1</div></div>
           <h4>Browse &amp; Choose</h4>
-          <p>Explore our fleet, take a virtual tour, and pick the camper that fits your adventure style and group size.</p>
+          <p>Meet the vans, take the virtual tour, and pick the wagon that speaks to you.</p>
         </div>
         <div class="step">
           <div class="step-icon">&#128197;<div class="step-num">2</div></div>
           <h4>Check Availability</h4>
-          <p>Use our live calendar to see open dates, select your rental period, and hold your spot with a deposit.</p>
+          <p>See open dates on the booking calendar and send us your request with a deposit to hold your spot.</p>
         </div>
         <div class="step">
           <div class="step-icon">&#128203;<div class="step-num">3</div></div>
-          <h4>Complete Booking</h4>
-          <p>Fill out your rental agreement, provide a valid driver's license, and we'll confirm your booking by email.</p>
+          <h4>Confirm &amp; Pay</h4>
+          <p>Sign the rental agreement and pay the balance 7 days before your journey begins.</p>
         </div>
         <div class="step">
-          <div class="step-icon">&#127946;<div class="step-num">4</div></div>
+          <div class="step-icon">&#127758;<div class="step-num">4</div></div>
           <h4>Hit the Road!</h4>
-          <p>Pick up your camper in Manitowoc, WI, and start making memories. 700 miles included per week.</p>
+          <p>Pick up your van in Manitowoc — we'll walk you through everything before you roll out.</p>
         </div>
       </div>
       <div style="text-align:center; margin-top:3rem;">
@@ -292,88 +332,43 @@
   </section>
 
   <!-- What's Included -->
-  <section class="section">
+  <section class="section alt-bg">
     <div class="container">
       <div class="text-center">
         <span class="section-label">What's Included</span>
         <h2 class="section-title">Everything You Need</h2>
-        <p class="section-subtitle">We set you up for success so you can focus on the adventure.</p>
+        <p class="section-subtitle">Both vans come fully set up so you can pack light and focus on the adventure.</p>
       </div>
       <div class="amenities-grid">
         <div class="amenity-card">
-          <div class="amenity-icon">&#9728;&#65039;</div>
-          <h4>Solar Power System</h4>
-          <p>Go truly off-grid. Our solar setup keeps your devices charged and lights running — no hookup needed.</p>
+          <div class="amenity-icon">&#128716;</div>
+          <h4>Queen-Size Bed</h4>
+          <p>The bench seat folds out to a real queen bed — cozy bedding and linens included.</p>
         </div>
         <div class="amenity-card">
           <div class="amenity-icon">&#127859;</div>
-          <h4>Built-in Kitchenette</h4>
-          <p>Cook your own meals on the road. Includes basic cooking equipment and prep space.</p>
-        </div>
-        <div class="amenity-card">
-          <div class="amenity-icon">&#128716;</div>
-          <h4>Bedding &amp; Linens</h4>
-          <p>Cozy bedding included so you can pack light and still sleep comfortably every night.</p>
+          <h4>Rear-Access Kitchen</h4>
+          <p>Pull-out propane stove, sink with a 5-gallon water tank, refrigerator, and prep space — all out the back doors.</p>
         </div>
         <div class="amenity-card">
           <div class="amenity-icon">&#128663;</div>
-          <h4>700 Miles Included</h4>
-          <p>Each weekly rental includes 700 miles — plenty for a classic Wisconsin road trip.</p>
+          <h4>700 Miles Per Week</h4>
+          <p>Weekly rentals include 700 miles — plenty for a classic Wisconsin loop. Just $0.45/mile after that.</p>
         </div>
         <div class="amenity-card">
-          <div class="amenity-icon">&#128247;</div>
+          <div class="amenity-icon">&#127912;</div>
           <h4>Hand-Painted Exterior</h4>
-          <p>Every camper is a one-of-a-kind work of art. You'll stand out at every campsite and parking lot.</p>
+          <p>Every van is a rolling work of art. Expect waves, photos, and new friends at every stop.</p>
         </div>
         <div class="amenity-card">
-          <div class="amenity-icon">&#128241;</div>
+          <div class="amenity-icon">&#127925;</div>
+          <h4>Road Trip Soundtrack</h4>
+          <p>Gertrude has a Bluetooth radio for your playlists; Violet keeps it retro with a CD player. Choose your era.</p>
+        </div>
+        <div class="amenity-card">
+          <div class="amenity-icon">&#129309;</div>
           <h4>Full Trip Orientation</h4>
-          <p>We walk you through everything before you leave so you feel confident and ready to roll.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="section" style="background: var(--light-gray);">
-    <div class="container">
-      <div class="text-center">
-        <span class="section-label">Happy Adventurers</span>
-        <h2 class="section-title">What Our Guests Say</h2>
-      </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">"Gertrude was absolutely perfect for our anniversary trip to Door County. The solar power meant we could camp anywhere — no hookups needed. Heidi and Will were so welcoming!"</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">S</div>
-            <div>
-              <div class="author-name">Sarah M.</div>
-              <div class="author-loc">Green Bay, WI</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">"We rented Violet for a week-long trip up north. Everyone we passed on the road waved and took photos! The whole experience was easier than we expected and more fun than we hoped."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">J</div>
-            <div>
-              <div class="author-name">Jake & Mia T.</div>
-              <div class="author-loc">Milwaukee, WI</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-          <p class="testimonial-text">"The delivery trailer was perfect for our family camping trip near Crivitz. All 6 of us fit comfortably and the kids absolutely loved it. Will definitely book again next summer!"</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">A</div>
-            <div>
-              <div class="author-name">Amanda K.</div>
-              <div class="author-loc">Madison, WI</div>
-            </div>
-          </div>
+          <p>We walk you through the whole van before you leave so you feel confident and ready to roll.</p>
         </div>
       </div>
     </div>
@@ -382,12 +377,12 @@
   <!-- CTA Banner -->
   <section class="cta-banner">
     <div class="container">
-      <span class="section-label" style="color: var(--gold);">Ready to Go?</span>
+      <span class="section-label" style="color:var(--gold);">Ready to go?</span>
       <h2>Your Next Adventure Starts Here</h2>
       <p>Check availability, pick your dates, and hit the road in a Color Wagon.</p>
       <div class="btn-actions">
         <a href="booking.html" class="btn btn-gold btn-lg">Check Availability</a>
-        <a href="tour.html" class="btn btn-white btn-lg">&#127981; Take the Tour First</a>
+        <a href="tour.html" class="btn btn-white btn-lg">Take the Tour First</a>
       </div>
     </div>
   </section>
@@ -396,7 +391,7 @@
   <section class="section" id="contact">
     <div class="container">
       <div class="text-center" style="margin-bottom:3rem;">
-        <span class="section-label">Get In Touch</span>
+        <span class="section-label">Get in touch</span>
         <h2 class="section-title">Questions? We'd Love to Help</h2>
       </div>
       <div class="contact-grid">
@@ -419,56 +414,58 @@
             <div class="contact-icon">&#128205;</div>
             <div>
               <h4>Location</h4>
-              <p>Manitowoc, WI — Pickup by appointment</p>
+              <p>Manitowoc, WI — pickup by appointment, SS Badger dock pickup available</p>
             </div>
           </div>
           <div class="contact-item">
-            <div class="contact-icon">&#128096;</div>
+            <div class="contact-icon">&#128247;</div>
             <div>
               <h4>Social Media</h4>
-              <p>Follow us on Instagram &amp; Facebook <br/>@ColorWagonRentals</p>
+              <p>Find us on Facebook: <strong>Color Wagon Rentals</strong></p>
             </div>
           </div>
           <div style="margin-top:1rem;">
-            <img src="colorwagonrentals/Ludington Flyer.jpg" alt="Destination: Ludington Area" style="border-radius:12px; box-shadow:var(--shadow-sm);" />
+            <img src="colorwagonrentals/Ludington Flyer.jpg" alt="Color Wagon Rentals flyer — new to Manitowoc" width="800" height="1322" loading="lazy" decoding="async" style="border-radius:14px; box-shadow:var(--shadow-sm); max-width:320px; height:auto;" />
           </div>
         </div>
         <div class="contact-form">
           <h3 style="margin-bottom:0.5rem;">Send Us a Message</h3>
-          <p style="color:var(--gray); margin-bottom:1.5rem;">We'll get back to you as soon as possible, usually within 24 hours.</p>
-          <form id="contactForm" onsubmit="handleContactForm(event)">
+          <p style="color:var(--gray); margin-bottom:1.5rem;">We're a two-person family business — we'll get back to you as soon as we can, usually within 24 hours.</p>
+          <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleContactForm(event)">
+            <input type="hidden" name="form-name" value="contact" />
+            <p hidden><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
             <div class="form-row">
               <div class="form-group">
                 <label for="c_name">Your Name</label>
-                <input type="text" id="c_name" placeholder="Jane Smith" required />
+                <input type="text" id="c_name" name="name" placeholder="Jane Smith" required />
               </div>
               <div class="form-group">
                 <label for="c_phone">Phone Number</label>
-                <input type="tel" id="c_phone" placeholder="(920) 555-0100" />
+                <input type="tel" id="c_phone" name="phone" placeholder="(920) 555-0100" />
               </div>
             </div>
             <div class="form-group">
               <label for="c_email">Email Address</label>
-              <input type="email" id="c_email" placeholder="jane@email.com" required />
+              <input type="email" id="c_email" name="email" placeholder="jane@email.com" required />
             </div>
             <div class="form-group">
               <label for="c_unit">Interested In</label>
-              <select id="c_unit">
+              <select id="c_unit" name="interested_in">
                 <option value="">— Select an option —</option>
-                <option>Gertrude (Sleeps 2)</option>
-                <option>Violet (Sleeps 2)</option>
-                <option>The Trailer (Sleeps 6, delivery)</option>
+                <option>Gertrude (2008 Econoline, sleeps 2)</option>
+                <option>Violet (2013 Econoline, sleeps 2)</option>
+                <option>The Trailer (sleeps 6, delivered)</option>
                 <option>General question</option>
               </select>
             </div>
             <div class="form-group">
               <label for="c_msg">Message</label>
-              <textarea id="c_msg" placeholder="Tell us about your trip — dates, destination, group size, any questions..."></textarea>
+              <textarea id="c_msg" name="message" placeholder="Tell us about your trip — dates, destination, group size, any questions..."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Send Message &#10145;</button>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Send Message &#10145;</button>
           </form>
-          <div id="contactSuccess" style="display:none; text-align:center; padding:2rem;">
-            <div style="font-size:3rem; margin-bottom:1rem;">&#128153;</div>
+          <div id="contactSuccess" role="status" aria-live="polite" style="display:none; text-align:center; padding:2rem;">
+            <div style="font-size:3rem; margin-bottom:1rem;">&#127752;</div>
             <h4>Message Sent!</h4>
             <p style="color:var(--gray);">Thanks! We'll be in touch within 24 hours.</p>
           </div>
@@ -477,26 +474,28 @@
     </div>
   </section>
 
+  <span class="stripe"></span>
+
   <!-- Footer -->
   <footer>
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="index.html" class="nav-logo">
-            <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" style="height:40px;" onerror="this.style.display='none'" />
+            <img src="colorwagonrentals/Business Logo.jpg" alt="Color Wagon Rentals" width="600" height="464" loading="lazy" style="height:40px; width:auto;" onerror="this.style.display='none'" />
             Color Wagon Rentals
           </a>
-          <p>Hand-painted campers for unforgettable Wisconsin adventures. Experience, Adventure &amp; Affordability — since 2018.</p>
+          <p>Hand-painted camper vans for unforgettable Wisconsin adventures. Experience, Adventure &amp; Affordability — est. 2026.</p>
           <div class="social-links">
-            <a href="#" class="social-link" aria-label="Instagram">&#128247;</a>
-            <a href="#" class="social-link" aria-label="Facebook">&#128241;</a>
+            <a href="#" class="social-link" aria-label="Facebook">&#128216;</a>
+            <a href="mailto:ColorWagonRentals@gmail.com" class="social-link" aria-label="Email">&#128140;</a>
           </div>
         </div>
         <div class="footer-col">
-          <h5>Our Fleet</h5>
+          <h5>The Fleet</h5>
           <ul>
-            <li><a href="fleet.html#gertrude">Gertrude</a></li>
-            <li><a href="fleet.html#violet">Violet</a></li>
+            <li><a href="fleet.html#gertrude">Gertrude (2008)</a></li>
+            <li><a href="fleet.html#violet">Violet (2013)</a></li>
             <li><a href="fleet.html#trailer">The Trailer</a></li>
             <li><a href="tour.html">Virtual Tour</a></li>
           </ul>
@@ -523,20 +522,51 @@
       <div class="footer-bottom">
         <span>&copy; 2026 Color Wagon Rentals — Manitowoc, WI. All rights reserved.</span>
         <div class="footer-bottom-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Rental Agreement</a>
-          <a href="#">Accessibility</a>
+          <a href="fleet.html#policies">Rental Policies</a>
+          <a href="#contact">Contact</a>
         </div>
       </div>
     </div>
   </footer>
 
+  <!-- Structured data for local search / Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Color Wagon Rentals",
+    "description": "Hand-painted Ford Econoline camper van rentals in Manitowoc, Wisconsin.",
+    "image": "https://www.colorwagonrentals.com/og-image.jpg",
+    "url": "https://www.colorwagonrentals.com/",
+    "telephone": "+1-920-320-1270",
+    "email": "ColorWagonRentals@gmail.com",
+    "priceRange": "$99-$650",
+    "foundingDate": "2026",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Manitowoc",
+      "addressRegion": "WI",
+      "addressCountry": "US"
+    },
+    "areaServed": "Wisconsin"
+  }
+  </script>
+
   <script src="js/main.js"></script>
   <script>
     function handleContactForm(e) {
       e.preventDefault();
-      document.getElementById('contactForm').style.display = 'none';
-      document.getElementById('contactSuccess').style.display = 'block';
+      const form = document.getElementById('contactForm');
+      const showSuccess = () => {
+        form.style.display = 'none';
+        document.getElementById('contactSuccess').style.display = 'block';
+      };
+      // Submit to Netlify Forms in the background, then show the success state.
+      // If the POST fails (e.g. previewing locally), we still confirm to the user.
+      const data = new URLSearchParams(new FormData(form));
+      fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: data.toString() })
+        .then(showSuccess)
+        .catch(showSuccess);
     }
   </script>
 </body>

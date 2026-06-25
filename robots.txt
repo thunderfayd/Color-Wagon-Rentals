@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /_backups/
+
+Sitemap: https://www.colorwagonrentals.com/sitemap.xml

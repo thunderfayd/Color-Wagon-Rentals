@@ -1,6 +1,20 @@
 /* =============================================
    Color Wagon Rentals — Booking System
+   Real booked dates live in js/bookings-data.js
    ============================================= */
+
+// ---- Pricing ----
+const NIGHTLY_RATE = 99;
+const WEEKLY_RATE = 650;
+const MILES_PER_WEEK = 700;
+const OVERAGE_PER_MILE = 0.45;
+
+// Weekly blocks + remaining nights, never more than another full week.
+function estimatePrice(nights) {
+  const weeks = Math.floor(nights / 7);
+  const rem = nights % 7;
+  return weeks * WEEKLY_RATE + Math.min(rem * NIGHTLY_RATE, WEEKLY_RATE);
+}
 
 // ---- State ----
 const state = {
@@ -14,51 +28,50 @@ const state = {
   groupSize: '', destination: '', specialRequests: ''
 };
 
-// ---- Pre-loaded bookings (demo data) ----
+// ---- Bookings: real dates from bookings-data.js + pending requests saved in this browser ----
 function getBookings() {
+  const real = (typeof CWR_BOOKED_DATES !== 'undefined' ? CWR_BOOKED_DATES : [])
+    .map((b, i) => ({ id: 'cal-' + i, ...b }));
   const stored = localStorage.getItem('cwrBookings');
-  const saved = stored ? JSON.parse(stored) : [];
-  // Merge with seed data, avoiding duplicates by id
-  const seedIds = new Set(saved.map(b => b.id));
-  const seeds = [
-    { id: 'seed1', unit: 'gertrude', start: '2026-06-14', end: '2026-06-21', name: 'Sample Guest' },
-    { id: 'seed2', unit: 'gertrude', start: '2026-07-05', end: '2026-07-12', name: 'Sample Guest' },
-    { id: 'seed3', unit: 'violet',   start: '2026-06-20', end: '2026-06-27', name: 'Sample Guest' },
-    { id: 'seed4', unit: 'violet',   start: '2026-07-18', end: '2026-07-25', name: 'Sample Guest' },
-    { id: 'seed5', unit: 'trailer',  start: '2026-07-04', end: '2026-07-11', name: 'Sample Guest' },
-    { id: 'seed6', unit: 'gertrude', start: '2026-08-01', end: '2026-08-08', name: 'Sample Guest' },
-    { id: 'seed7', unit: 'violet',   start: '2026-08-15', end: '2026-08-22', name: 'Sample Guest' },
-  ].filter(s => !seedIds.has(s.id));
-  return [...saved, ...seeds];
+  const requests = stored ? JSON.parse(stored) : [];
+  return [...real, ...requests];
 }
 
 function saveBooking(booking) {
-  const bookings = getBookings().filter(b => !b.id.startsWith('seed'));
-  bookings.push(booking);
-  localStorage.setItem('cwrBookings', JSON.stringify(bookings));
+  const stored = localStorage.getItem('cwrBookings');
+  const requests = stored ? JSON.parse(stored) : [];
+  requests.push(booking);
+  localStorage.setItem('cwrBookings', JSON.stringify(requests));
 }
 
 // ---- Unit config ----
 const UNITS = {
-  gertrude: { name: 'Gertrude', price: 650, color: '#DC2626', emoji: '🌿', sleeps: 2 },
-  violet:   { name: 'Violet',   price: 650, color: '#7C3AED', emoji: '💜', sleeps: 2 },
-  trailer:  { name: 'The Trailer', price: null, color: '#D97706', emoji: '🏠', sleeps: 6 }
+  gertrude: { name: 'Gertrude', priced: true, color: '#C2700E', emoji: '🍂', sleeps: 2 },
+  violet:   { name: 'Violet',   priced: true, color: '#7C3AED', emoji: '🐸', sleeps: 2 },
+  trailer:  { name: 'The Trailer', priced: false, color: '#B45309', emoji: '🏕️', sleeps: 6 }
 };
 
 // ---- FullCalendar (availability overview) ----
 let fullCalendar = null;
 let activeFilter = 'all';
 
+// 'end' in the data is the return day; FullCalendar treats end as exclusive,
+// so push it one day forward to display the full booked range.
+function displayEnd(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
 function getCalendarEvents(filter) {
-  const bookings = getBookings();
-  return bookings
+  return getBookings()
     .filter(b => filter === 'all' || b.unit === filter)
     .map(b => {
       const unit = UNITS[b.unit] || {};
       return {
-        title: unit.name || b.unit,
+        title: (unit.name || b.unit) + ' booked',
         start: b.start,
-        end: b.end,
+        end: displayEnd(b.end),
         classNames: ['booked-' + b.unit],
         extendedProps: { unit: b.unit }
       };
@@ -86,21 +99,19 @@ function initFullCalendar() {
     eventClick(info) {
       const unit = info.event.extendedProps.unit;
       const unitData = UNITS[unit] || {};
-      alert(`This ${unitData.name || unit} rental is already booked.\n\nStart: ${info.event.startStr}\nEnd: ${info.event.endStr}\n\nPlease choose different dates or a different camper.`);
+      alert(`${unitData.name || unit} is already booked for those dates.\n\nPlease choose different dates or a different camper — or give us a call, we may be able to work something out!`);
     },
     dateClick(info) {
       const today = new Date();
-      today.setHours(0,0,0,0);
-      const clicked = new Date(info.dateStr);
+      today.setHours(0, 0, 0, 0);
+      const clicked = new Date(info.dateStr + 'T00:00:00');
       if (clicked < today) return;
-      // Jump to booking form
       const section = document.getElementById('booking-form');
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Pre-fill pickup date if we're on step 2 or later
         setTimeout(() => {
           if (state.step >= 2 && pickupFlatpickr) {
-            pickupFlatpickr.setDate(info.dateStr);
+            pickupFlatpickr.setDate(info.dateStr, true);
           }
         }, 500);
       }
@@ -111,18 +122,14 @@ function initFullCalendar() {
   fullCalendar.render();
 }
 
-// ---- Mini calendar for date step ----
-let miniCalendar = null;
+// ---- Date pickers ----
 let pickupFlatpickr = null;
 let returnFlatpickr = null;
 
 function initDatePickers() {
   const pickupEl = document.getElementById('pickupDate');
   const returnEl = document.getElementById('returnDate');
-  if (!pickupEl || !returnEl) return;
-
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  if (!pickupEl || !returnEl || typeof flatpickr === 'undefined') return;
 
   pickupFlatpickr = flatpickr(pickupEl, {
     minDate: 'today',
@@ -133,7 +140,7 @@ function initDatePickers() {
       if (selectedDates.length) {
         state.pickupDate = selectedDates[0];
         const minReturn = new Date(selectedDates[0]);
-        minReturn.setDate(minReturn.getDate() + 7);
+        minReturn.setDate(minReturn.getDate() + 1);
         returnFlatpickr.set('minDate', minReturn);
         if (state.returnDate && state.returnDate < minReturn) {
           returnFlatpickr.clear();
@@ -146,7 +153,7 @@ function initDatePickers() {
   });
 
   returnFlatpickr = flatpickr(returnEl, {
-    minDate: new Date(today.getTime() + 7 * 86400000),
+    minDate: new Date(Date.now() + 86400000),
     dateFormat: 'Y-m-d',
     altInput: true,
     altFormat: 'F j, Y',
@@ -158,6 +165,20 @@ function initDatePickers() {
       }
     }
   });
+}
+
+// Booked ranges block pickup/return overlap; the return day itself is
+// left open so a new rental can start the day another one ends.
+function hasConflict(unit, pickup, ret) {
+  const pStart = pickup.getTime();
+  const pEnd = ret.getTime();
+  return getBookings()
+    .filter(b => b.unit === unit)
+    .some(b => {
+      const bStart = new Date(b.start + 'T00:00:00').getTime();
+      const bEnd = new Date(b.end + 'T00:00:00').getTime();
+      return pStart < bEnd && pEnd > bStart;
+    });
 }
 
 function checkDateAvailability() {
@@ -175,38 +196,27 @@ function checkDateAvailability() {
   const nights = Math.round((state.returnDate - state.pickupDate) / 86400000);
   state.nights = nights;
 
-  if (nights < 7) {
+  if (nights < 1) {
     conflictAlert.style.display = 'block';
-    conflictAlert.textContent = '⚠️ Minimum rental is 7 nights. Please extend your return date.';
+    conflictAlert.textContent = '⚠️ Return date must be after your pickup date.';
     okAlert.style.display = 'none';
     return;
   }
 
-  // Check conflicts
-  if (state.vehicle) {
-    const bookings = getBookings().filter(b => b.unit === state.vehicle);
-    const pStart = state.pickupDate.getTime();
-    const pEnd = state.returnDate.getTime();
-    const conflict = bookings.some(b => {
-      const bStart = new Date(b.start).getTime();
-      const bEnd = new Date(b.end).getTime();
-      return pStart < bEnd && pEnd > bStart;
-    });
-    if (conflict) {
-      conflictAlert.style.display = 'block';
-      conflictAlert.textContent = '⚠️ Those dates overlap with an existing booking for ' + UNITS[state.vehicle].name + '. Please choose different dates or a different unit.';
-      okAlert.style.display = 'none';
-      return;
-    }
+  if (state.vehicle && hasConflict(state.vehicle, state.pickupDate, state.returnDate)) {
+    conflictAlert.style.display = 'block';
+    conflictAlert.textContent = '⚠️ Those dates overlap with an existing booking for ' + UNITS[state.vehicle].name + '. Please choose different dates or the other van.';
+    okAlert.style.display = 'none';
+    return;
   }
 
   conflictAlert.style.display = 'none';
   okAlert.style.display = 'block';
   const weeks = Math.floor(nights / 7);
   const extra = nights % 7;
-  let txt = `${nights} nights`;
-  if (weeks > 0) txt += ` (${weeks} week${weeks > 1 ? 's' : ''}${extra > 0 ? ' + ' + extra + ' day' + (extra > 1 ? 's' : '') : ''})`;
-  if (nightsSummary) nightsSummary.textContent = txt + ' — These dates are available!';
+  let txt = `${nights} night${nights > 1 ? 's' : ''}`;
+  if (weeks > 0) txt += ` (${weeks} week${weeks > 1 ? 's' : ''}${extra > 0 ? ' + ' + extra + ' night' + (extra > 1 ? 's' : '') : ''})`;
+  if (nightsSummary) nightsSummary.textContent = txt + ' — these dates are open!';
 }
 
 // ---- Vehicle Selection ----
@@ -214,9 +224,10 @@ function selectVehicle(unit, el) {
   state.vehicle = unit;
   document.querySelectorAll('.vehicle-option').forEach(o => o.classList.remove('selected'));
   if (el) el.classList.add('selected');
+  const err = document.getElementById('v-error');
+  if (err) err.style.display = 'none';
   updateSummary();
   checkDateAvailability();
-  // Refresh full calendar filter if on all
   if (fullCalendar && activeFilter !== 'all') {
     filterCalendar(unit, null);
     document.querySelectorAll('.cal-filter-btn').forEach(b => {
@@ -226,8 +237,8 @@ function selectVehicle(unit, el) {
   }
 }
 
-// Handle URL param for pre-selecting unit
-(function() {
+// Pre-select unit from ?unit= in the URL
+(function () {
   const p = new URLSearchParams(window.location.search);
   const u = p.get('unit');
   if (u && UNITS[u]) {
@@ -253,7 +264,7 @@ function validateStep(step) {
   if (step === 1) {
     const err = document.getElementById('v-error');
     if (!state.vehicle) {
-      if (err) { err.style.display = 'block'; }
+      if (err) err.style.display = 'block';
       return false;
     }
     if (err) err.style.display = 'none';
@@ -264,23 +275,12 @@ function validateStep(step) {
     const pickupErr = document.getElementById('pickup-error');
     const returnErr = document.getElementById('return-error');
     if (!state.pickupDate) { if (pickupErr) pickupErr.classList.add('show'); ok = false; }
-    else { if (pickupErr) pickupErr.classList.remove('show'); }
-    if (!state.returnDate || state.nights < 7) { if (returnErr) returnErr.classList.add('show'); ok = false; }
-    else { if (returnErr) returnErr.classList.remove('show'); }
-    // Check conflict
-    if (ok && state.vehicle) {
-      const bookings = getBookings().filter(b => b.unit === state.vehicle);
-      const pStart = state.pickupDate.getTime();
-      const pEnd = state.returnDate.getTime();
-      const conflict = bookings.some(b => {
-        const bStart = new Date(b.start).getTime();
-        const bEnd = new Date(b.end).getTime();
-        return pStart < bEnd && pEnd > bStart;
-      });
-      if (conflict) {
-        alert('Those dates are already booked for ' + UNITS[state.vehicle].name + '. Please choose different dates.');
-        return false;
-      }
+    else if (pickupErr) pickupErr.classList.remove('show');
+    if (!state.returnDate || state.nights < 1) { if (returnErr) returnErr.classList.add('show'); ok = false; }
+    else if (returnErr) returnErr.classList.remove('show');
+    if (ok && state.vehicle && hasConflict(state.vehicle, state.pickupDate, state.returnDate)) {
+      alert('Those dates are already booked for ' + UNITS[state.vehicle].name + '. Please choose different dates.');
+      return false;
     }
     return ok;
   }
@@ -307,7 +307,6 @@ function validateStep(step) {
     checkField('licenseNum', 'lic-error', v => v.length > 3);
     checkField('licenseState', 'state-error', v => v.length > 0);
     checkField('groupSize', 'group-error', v => v.length > 0);
-    // Age check
     const dobEl = document.getElementById('dob');
     const dobErr = document.getElementById('dob-error');
     if (dobEl && dobEl.value) {
@@ -342,10 +341,6 @@ function validateStep(step) {
     }
     return ok;
   }
-  if (step === 4) {
-    // Handled in submitBooking
-    return true;
-  }
   return true;
 }
 
@@ -358,9 +353,7 @@ function renderSteps() {
     if (dot) {
       dot.classList.toggle('active', i === state.step);
       dot.classList.toggle('done', i < state.step);
-      if (i < state.step) dot.innerHTML = '';
-      else if (i === state.step) dot.innerHTML = '<span class="num">' + i + '</span>';
-      else dot.innerHTML = '<span class="num">' + i + '</span>';
+      dot.innerHTML = i < state.step ? '' : '<span class="num">' + i + '</span>';
     }
     if (lbl) lbl.classList.toggle('active', i === state.step);
     if (i < 5) {
@@ -382,16 +375,12 @@ function updateSummary() {
     const u = UNITS[state.vehicle];
     rows.push(['Camper', u.emoji + ' ' + u.name]);
   }
-  if (state.pickupDate) {
-    rows.push(['Pickup', formatDate(state.pickupDate)]);
-  }
+  if (state.pickupDate) rows.push(['Pickup', formatDate(state.pickupDate)]);
   if (state.returnDate) {
     rows.push(['Return', formatDate(state.returnDate)]);
-    if (state.nights > 0) rows.push(['Duration', state.nights + ' nights']);
+    if (state.nights > 0) rows.push(['Duration', state.nights + ' night' + (state.nights > 1 ? 's' : '')]);
   }
-  if (state.firstName) {
-    rows.push(['Guest', state.firstName + ' ' + state.lastName]);
-  }
+  if (state.firstName) rows.push(['Guest', state.firstName + ' ' + state.lastName]);
 
   if (rows.length === 0) {
     body.innerHTML = '<p class="summary-empty">Your booking details will appear here as you complete each step.</p>';
@@ -403,17 +392,11 @@ function updateSummary() {
     `<div class="summary-row"><span class="label">${label}</span><span>${val}</span></div>`
   ).join('');
 
-  // Price
-  if (state.vehicle && state.nights > 0) {
-    const u = UNITS[state.vehicle];
-    if (u.price) {
-      const weeks = Math.ceil(state.nights / 7);
-      const est = weeks * u.price;
-      if (cta) cta.style.display = 'block';
-      if (total) total.textContent = '$' + est.toLocaleString();
-    } else {
-      if (cta) cta.style.display = 'none';
-    }
+  if (state.vehicle && state.nights > 0 && UNITS[state.vehicle].priced) {
+    if (cta) cta.style.display = 'block';
+    if (total) total.textContent = '$' + estimatePrice(state.nights).toLocaleString();
+  } else if (cta) {
+    cta.style.display = 'none';
   }
 }
 
@@ -427,36 +410,22 @@ function buildReviewSummary() {
   const el = document.getElementById('review-summary');
   if (!el) return;
   const u = UNITS[state.vehicle] || {};
-  const weeks = Math.ceil(state.nights / 7);
-  const est = u.price ? '$' + (weeks * u.price).toLocaleString() : 'Contact for pricing';
+  const est = u.priced ? '$' + estimatePrice(state.nights).toLocaleString() : 'Contact for pricing';
+  const cell = (label, value) => `
+      <div>
+        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">${label}</div>
+        <div style="font-weight:700;">${value}</div>
+      </div>`;
   el.innerHTML = `
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Camper</div>
-        <div style="font-weight:600;">${u.emoji || ''} ${u.name || state.vehicle}</div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Guest</div>
-        <div style="font-weight:600;">${state.firstName} ${state.lastName}</div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Pickup Date</div>
-        <div style="font-weight:600;">${formatDate(state.pickupDate)}</div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Return Date</div>
-        <div style="font-weight:600;">${formatDate(state.returnDate)}</div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Duration</div>
-        <div style="font-weight:600;">${state.nights} nights (${weeks} week${weeks > 1 ? 's' : ''})</div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">Estimated Total</div>
-        <div style="font-weight:700; color:var(--green); font-size:1.1rem;">${est}</div>
-      </div>
+      ${cell('Camper', (u.emoji || '') + ' ' + (u.name || state.vehicle))}
+      ${cell('Guest', state.firstName + ' ' + state.lastName)}
+      ${cell('Pickup Date', formatDate(state.pickupDate))}
+      ${cell('Return Date', formatDate(state.returnDate))}
+      ${cell('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : ''))}
+      ${cell('Estimated Total', '<span style="color:var(--green-dark); font-size:1.1rem;">' + est + '</span>')}
     </div>
-    <div style="border-top:1px solid #E5E7EB; padding-top:1rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.875rem; color:#374151;">
+    <div style="border-top:1px solid var(--cream-dark); padding-top:1rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.875rem;">
       <div><span style="color:var(--gray);">Email:</span> ${state.email}</div>
       <div><span style="color:var(--gray);">Phone:</span> ${state.phone}</div>
       <div><span style="color:var(--gray);">Group:</span> ${state.groupSize} traveler${state.groupSize !== '1' ? 's' : ''}</div>
@@ -477,60 +446,72 @@ function submitBooking() {
   }
   if (termsErr) termsErr.style.display = 'none';
 
-  // Generate booking ID
   const id = 'CWR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  const booking = {
+  const startStr = state.pickupDate.toISOString().split('T')[0];
+  const endStr = state.returnDate.toISOString().split('T')[0];
+  const u = UNITS[state.vehicle] || {};
+
+  // Save locally so this browser's calendar blocks the requested dates right away.
+  saveBooking({
     id,
     unit: state.vehicle,
-    start: state.pickupDate.toISOString().split('T')[0],
-    end: state.returnDate.toISOString().split('T')[0],
+    start: startStr,
+    end: endStr,
     name: state.firstName + ' ' + state.lastName,
     email: state.email,
     phone: state.phone,
     groupSize: state.groupSize,
     submittedAt: new Date().toISOString()
-  };
-  saveBooking(booking);
+  });
 
-  // Show confirmation
+  // Deliver the request to Heidi & Will via Netlify Forms (no backend needed).
+  // Fails silently if previewing locally — the confirmation still shows and the
+  // request is preserved in localStorage above.
+  const payload = new URLSearchParams({
+    'form-name': 'booking',
+    confirmation_id: id,
+    camper: u.name || state.vehicle,
+    pickup_date: startStr,
+    return_date: endStr,
+    nights: String(state.nights),
+    estimated_total: u.priced ? '$' + estimatePrice(state.nights) : 'Contact for pricing',
+    first_name: state.firstName,
+    last_name: state.lastName,
+    email: state.email,
+    phone: state.phone,
+    address: state.address,
+    date_of_birth: state.dob,
+    license_number: state.licenseNum,
+    license_state: state.licenseState,
+    group_size: state.groupSize,
+    destination: state.destination,
+    special_requests: state.specialRequests
+  });
+  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
+    .catch(() => { /* offline / local preview — request is still saved locally */ });
+
   document.getElementById('confirmationId').textContent = id;
   const emailEl = document.getElementById('confirmEmail');
   if (emailEl) emailEl.textContent = state.email;
 
-  const u = UNITS[state.vehicle] || {};
-  const weeks = Math.ceil(state.nights / 7);
   const confDet = document.getElementById('confirmationDetails');
   if (confDet) {
-    confDet.innerHTML = `
+    const card = (label, value) => `
       <div class="conf-detail-card">
-        <div class="label">Camper</div>
-        <div class="value">${u.emoji || ''} ${u.name || state.vehicle}</div>
-      </div>
-      <div class="conf-detail-card">
-        <div class="label">Guest Name</div>
-        <div class="value">${state.firstName} ${state.lastName}</div>
-      </div>
-      <div class="conf-detail-card">
-        <div class="label">Pickup Date</div>
-        <div class="value">${formatDate(state.pickupDate)}</div>
-      </div>
-      <div class="conf-detail-card">
-        <div class="label">Return Date</div>
-        <div class="value">${formatDate(state.returnDate)}</div>
-      </div>
-      <div class="conf-detail-card">
-        <div class="label">Duration</div>
-        <div class="value">${state.nights} nights</div>
-      </div>
-      <div class="conf-detail-card">
-        <div class="label">Booking Status</div>
-        <div class="value" style="color:var(--gold);">⏳ Pending Confirmation</div>
+        <div class="label">${label}</div>
+        <div class="value">${value}</div>
       </div>`;
+    confDet.innerHTML =
+      card('Camper', (u.emoji || '') + ' ' + (u.name || state.vehicle)) +
+      card('Guest Name', state.firstName + ' ' + state.lastName) +
+      card('Pickup Date', formatDate(state.pickupDate)) +
+      card('Return Date', formatDate(state.returnDate)) +
+      card('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : '')) +
+      card('Booking Status', '<span style="color:var(--gertrude);">⏳ Pending Confirmation</span>');
   }
 
   goToStep(5);
 
-  // Refresh the full calendar to show new booking
   if (fullCalendar) {
     fullCalendar.removeAllEvents();
     fullCalendar.addEventSource(getCalendarEvents(activeFilter));

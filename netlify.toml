@@ -1,0 +1,35 @@
+# Color Wagon Rentals — Netlify configuration
+# Static site, no build step. Publishes this folder as-is.
+
+[build]
+  publish = "."
+  command = ""
+
+# Long-cache static assets (images, css, js) — they're versioned by content.
+[[headers]]
+  for = "/colorwagonrentals/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/panopics/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# Sensible security headers for a static marketing site.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"

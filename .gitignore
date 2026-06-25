@@ -1,0 +1,7 @@
+# Local-only backups of the original full-resolution images (not for deploy)
+_backups/
+*.zip
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

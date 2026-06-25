@@ -3,7 +3,17 @@
     "allow": [
       "WebFetch(domain:www.colorwagonrentals.com)",
       "PowerShell(New-Item *)",
-      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\thund\\\\Downloads\\\\Website for Heidi's Rental Business\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}} | Sort-Object FullName)"
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\thund\\\\Downloads\\\\Website for Heidi's Rental Business\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}} | Sort-Object FullName)",
+      "Bash(node --check js/booking.js)",
+      "Bash(node --check js/main.js)",
+      "Bash(node --check js/bookings-data.js)",
+      "Bash(cygpath *)",
+      "Bash(unzip -l gertrudepictures.zip)",
+      "Bash(mkdir -p gertrudepictures)",
+      "Bash(unzip -o gertrudepictures.zip -d gertrudepictures)",
+      "Bash(python -)",
+      "Bash(python -m pip install --quiet Pillow)",
+      "Bash(python -c \"import PIL; print\\('PIL ok', PIL.__version__\\)\")"
     ]
   }
 }
