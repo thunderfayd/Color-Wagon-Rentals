@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#145A33">
+  <title>CWR Admin</title>
+  <!-- Supabase (real-time database) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- Static booking data (fallback until Supabase is configured) -->
+  <script src="js/bookings-data.js"></script>
+  <style>
+    :root {
+      --green:#1E7A46; --green-dark:#145A33; --green-deep:#0E3D23;
+      --cream:#FFF9EF; --cream-dark:#F0E7D3;
+      --ink:#20312A; --gray:#5C6961;
+      --gertrude:#C2700E; --gertrude-soft:#FFF1DC;
+      --violet:#7C3AED;  --violet-soft:#F3EDFF;
+      --trailer:#B45309; --trailer-soft:#FEF3C7;
+      --red:#DC2626; --red-soft:#FEE2E2;
+      --blue:#2563EB; --blue-soft:#EFF6FF;
+      --shadow-sm:0 2px 8px rgba(32,49,42,.08);
+      --shadow:0 4px 20px rgba(32,49,42,.14);
+      --r:12px; --r-sm:8px; --nav-h:62px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+      background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;
+      overscroll-behavior:none}
+
+    /* ── LOCK ─────────────────────────────────────────────── */
+    #lockScreen{position:fixed;inset:0;background:linear-gradient(160deg,var(--green-deep),var(--green-dark));
+      display:flex;align-items:center;justify-content:center;z-index:999;padding:1.5rem}
+    .lock-card{background:#fff;border-radius:22px;padding:2rem 1.5rem;width:100%;max-width:320px;
+      text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.3)}
+    .lock-logo{font-size:2.75rem;margin-bottom:.5rem}
+    .lock-card h1{font-size:1.2rem;font-weight:800;color:var(--green-deep);margin-bottom:.2rem}
+    #lockSubtitle{font-size:.82rem;color:var(--gray);margin-bottom:1.25rem}
+    .pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:.75rem}
+    .pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--cream-dark);transition:all .15s}
+    .pin-dot.filled{background:var(--green);border-color:var(--green)}
+    #lockError{font-size:.78rem;color:var(--red);height:1rem;margin-bottom:.5rem}
+    .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:.25rem}
+    .pin-key{padding:.8rem;border-radius:var(--r-sm);font-size:1.2rem;font-weight:700;
+      background:var(--cream);color:var(--ink);border:1px solid var(--cream-dark);
+      cursor:pointer;transition:background .1s,transform .1s;user-select:none}
+    .pin-key:active{background:var(--cream-dark);transform:scale(.94)}
+    .pin-key.del{font-size:.95rem;background:var(--red-soft);color:var(--red)}
+    .pin-key.empty{background:transparent;border-color:transparent;cursor:default}
+
+    /* ── APP SHELL ────────────────────────────────────────── */
+    #app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto}
+    .app-header{background:var(--green-dark);color:#fff;padding:.9rem 1.1rem .8rem;
+      display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .app-header h2{font-size:.95rem;font-weight:800;letter-spacing:.02em}
+    .hdr-right{display:flex;align-items:center;gap:.5rem}
+    .hdr-badge{background:rgba(255,255,255,.2);border-radius:999px;
+      padding:.2rem .6rem;font-size:.68rem;font-weight:700;color:#fff}
+    .hdr-badge.live{background:rgba(34,197,94,.35)}
+    .hdr-badge.offline{background:rgba(239,68,68,.35)}
+    .hdr-btn{background:rgba(255,255,255,.15);border:none;border-radius:var(--r-sm);
+      color:#fff;padding:.35rem .7rem;font-size:.72rem;font-weight:700;cursor:pointer}
+    main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .tab{display:none;padding:1rem}
+    .tab.active{display:block}
+
+    /* ── BOTTOM NAV ───────────────────────────────────────── */
+    #nav{height:var(--nav-h);background:#fff;border-top:1px solid var(--cream-dark);
+      display:grid;grid-template-columns:repeat(5,1fr);flex-shrink:0}
+    .nb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+      cursor:pointer;border:none;background:none;color:var(--gray);transition:color .15s;padding:.4rem}
+    .nb.active{color:var(--green)}
+    .nb svg{width:21px;height:21px}
+    .nb span{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+
+    /* ── STAT CARDS ───────────────────────────────────────── */
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.9rem}
+    .stat{background:#fff;border-radius:var(--r);padding:.9rem 1rem;box-shadow:var(--shadow-sm)}
+    .stat .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:.3rem}
+    .stat .val{font-size:1.65rem;font-weight:900;line-height:1}
+    .stat .sub{font-size:.68rem;color:var(--gray);margin-top:.2rem}
+
+    .greeting{background:linear-gradient(135deg,var(--green-dark),var(--green));color:#fff;
+      border-radius:var(--r);padding:1.1rem 1.2rem;margin-bottom:.9rem;box-shadow:var(--shadow)}
+    .greeting h3{font-size:1.05rem;font-weight:800;margin-bottom:.2rem}
+    .greeting p{font-size:.78rem;opacity:.82}
+
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;margin-top:.9rem}
+    .sec-title{font-size:.78rem;font-weight:800;color:var(--green-deep);text-transform:uppercase;letter-spacing:.06em}
+    .txt-btn{font-size:.78rem;color:var(--green);font-weight:700;cursor:pointer;background:none;border:none;padding:0}
+
+    /* ── BOOKING CARD ─────────────────────────────────────── */
+    .bc{background:#fff;border-radius:var(--r);padding:.8rem .95rem;box-shadow:var(--shadow-sm);
+      margin-bottom:.55rem;display:flex;align-items:center;gap:.8rem;cursor:pointer;transition:transform .1s}
+    .bc:active{transform:scale(.98)}
+    .bc-bar{width:8px;border-radius:4px;align-self:stretch;min-height:44px;flex-shrink:0}
+    .bc-info{flex:1;min-width:0}
+    .bc-unit{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.1rem}
+    .bc-unit.gertrude{color:var(--gertrude)}.bc-unit.violet{color:var(--violet)}.bc-unit.trailer{color:var(--trailer)}
+    .bc-dates{font-size:.85rem;font-weight:600}
+    .bc-meta{font-size:.72rem;color:var(--gray);margin-top:1px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+    .bc-right{text-align:right;flex-shrink:0}
+    .bc-nights{font-size:.75rem;font-weight:800;color:var(--green-deep)}
+    .bc-price{font-size:.7rem;color:var(--gray)}
+    .badge{display:inline-block;font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
+    .b-pending{background:var(--gertrude-soft);color:var(--gertrude)}
+    .b-confirmed{background:#D1FAE5;color:#065F46}
+    .b-declined{background:var(--red-soft);color:var(--red)}
+    .empty{text-align:center;color:var(--gray);padding:1.75rem 1rem;font-size:.85rem}
+    .empty-icon{font-size:2rem;margin-bottom:.4rem}
+
+    /* ── CALENDAR ─────────────────────────────────────────── */
+    .cal-hdr{display:flex;align-items:center;justify-content:space-between;background:#fff;
+      border-radius:var(--r);padding:.8rem 1rem;box-shadow:var(--shadow-sm);margin-bottom:.7rem}
+    .cal-nav{width:34px;height:34px;border-radius:50%;background:var(--cream);border:none;
+      cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+    .cal-nav:active{background:var(--cream-dark)}
+    .cal-mo{font-size:.95rem;font-weight:800}
+    .cal-legend{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;margin-bottom:.65rem}
+    .leg{display:flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;color:var(--gray)}
+    .leg-dot{width:9px;height:9px;border-radius:50%}
+    .cal-grid{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm)}
+    .cal-wk{display:grid;grid-template-columns:repeat(7,1fr);background:var(--green-dark);padding:.45rem 0}
+    .cal-wd{text-align:center;font-size:.6rem;font-weight:800;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.05em}
+    .cal-days{display:grid;grid-template-columns:repeat(7,1fr)}
+    .cd{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:2px;cursor:pointer;transition:background .1s;min-height:42px}
+    .cd:active{background:var(--cream-dark)}.cd.other{opacity:.28}.cd.past{opacity:.38;cursor:default}
+    .cd.istoday .cd-n{background:var(--green);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+    .cd-n{font-size:.78rem;font-weight:700;z-index:1}
+    .cd-dots{display:flex;gap:2px}.cd-dot{width:5px;height:5px;border-radius:50%}
+    .cd.bg-g{background:linear-gradient(180deg,var(--gertrude-soft),#fff)}
+    .cd.bg-v{background:linear-gradient(180deg,var(--violet-soft),#fff)}
+    .cd.bg-gv{background:linear-gradient(90deg,var(--gertrude-soft) 50%,var(--violet-soft) 50%)}
+    .cd.bg-t{background:linear-gradient(180deg,var(--trailer-soft),#fff)}
+    .cd.bg-all{background:linear-gradient(180deg,#FEE2E2,#fff)}
+
+    /* ── FILTER PILLS ─────────────────────────────────────── */
+    .pills{display:flex;gap:.45rem;overflow-x:auto;padding-bottom:4px;margin-bottom:.7rem}
+    .pills::-webkit-scrollbar{display:none}
+    .pill{padding:.32rem .8rem;border-radius:999px;border:2px solid var(--cream-dark);
+      font-size:.72rem;font-weight:700;background:#fff;color:var(--gray);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+    .pill.on{background:var(--green);border-color:var(--green);color:#fff}
+
+    /* ── MODAL ────────────────────────────────────────────── */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;
+      display:flex;align-items:flex-end;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .2s}
+    .backdrop.open{opacity:1;pointer-events:auto}
+    .sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:500px;
+      padding:1.4rem 1.2rem 2rem;max-height:88vh;overflow-y:auto;
+      transform:translateY(100%);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+    .backdrop.open .sheet{transform:translateY(0)}
+    .handle{width:38px;height:4px;background:var(--cream-dark);border-radius:2px;margin:0 auto 1.1rem}
+    .m-title{font-size:1.05rem;font-weight:800;margin-bottom:.9rem}
+
+    /* ── FORMS ────────────────────────────────────────────── */
+    .fg{margin-bottom:.85rem}
+    .fl{display:block;font-size:.75rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.32rem}
+    .fi,.fs{width:100%;padding:.7rem .9rem;border:2px solid var(--cream-dark);border-radius:var(--r-sm);font-size:.95rem;font-family:inherit;color:var(--ink);background:#fff;transition:border-color .15s;-webkit-appearance:none}
+    .fi:focus,.fs:focus{outline:none;border-color:var(--green)}
+    .fi-note{font-size:.7rem;color:var(--gray);margin-top:.3rem}
+    .van-row{display:flex;gap:.45rem}
+    .vb{flex:1;padding:.55rem .3rem;border:2px solid var(--cream-dark);border-radius:var(--r-sm);font-size:.72rem;font-weight:700;background:#fff;cursor:pointer;transition:all .15s;text-align:center}
+    .vb.g{background:var(--gertrude-soft);border-color:var(--gertrude);color:var(--gertrude)}
+    .vb.v{background:var(--violet-soft);border-color:var(--violet);color:var(--violet)}
+    .vb.t{background:var(--trailer-soft);border-color:var(--trailer);color:var(--trailer)}
+
+    /* ── BUTTONS ──────────────────────────────────────────── */
+    .btn{display:block;width:100%;padding:.8rem;border-radius:var(--r-sm);font-size:.95rem;font-weight:800;border:none;cursor:pointer;transition:opacity .15s,transform .1s;text-align:center}
+    .btn:active{transform:scale(.98);opacity:.9}
+    .btn-p{background:var(--green);color:#fff}
+    .btn-d{background:var(--red);color:#fff}
+    .btn-b{background:var(--blue);color:#fff}
+    .btn-o{background:transparent;border:2px solid var(--cream-dark);color:var(--ink)}
+    .btn-row{display:flex;gap:.5rem;margin-top:.9rem}
+    .btn-row .btn{flex:1}
+    .btn-sm{padding:.45rem .8rem;font-size:.78rem;display:inline-block;width:auto}
+
+    /* ── FAB ──────────────────────────────────────────────── */
+    #fab{position:fixed;bottom:calc(var(--nav-h) + .9rem);right:.9rem;width:50px;height:50px;
+      border-radius:50%;background:var(--green);color:#fff;border:none;cursor:pointer;
+      font-size:1.5rem;box-shadow:0 4px 18px rgba(30,122,70,.45);
+      display:none;align-items:center;justify-content:center;z-index:50}
+    #fab:active{transform:scale(.92)}
+
+    /* ── TOAST ────────────────────────────────────────────── */
+    #toast{position:fixed;bottom:calc(var(--nav-h) + .9rem);left:50%;
+      transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;
+      padding:.55rem 1.1rem;border-radius:999px;font-size:.82rem;font-weight:600;
+      opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:300}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ── SETTINGS ─────────────────────────────────────────── */
+    .sset{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:.9rem}
+    .srow{display:flex;align-items:center;gap:.85rem;padding:.8rem .95rem;
+      border-bottom:1px solid var(--cream-dark);cursor:pointer;transition:background .1s}
+    .srow:last-child{border-bottom:none}
+    .srow:active{background:var(--cream)}
+    .sicon{font-size:1.15rem;width:26px;text-align:center;flex-shrink:0}
+    .slbl{flex:1}.slbl strong{display:block;font-size:.85rem;font-weight:700;color:var(--ink)}
+    .slbl span{font-size:.72rem;color:var(--gray)}
+    .schev{color:var(--cream-dark);font-size:.95rem}
+
+    /* ── CONNECTION BANNER ────────────────────────────────── */
+    .conn-banner{border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.9rem;font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:.5rem}
+    .conn-banner.live{background:#D1FAE5;color:#065F46}
+    .conn-banner.setup{background:var(--blue-soft);color:var(--blue)}
+    .conn-banner.err{background:var(--red-soft);color:var(--red)}
+
+    /* ── ANALYTICS ────────────────────────────────────────── */
+    .occ-bar{height:8px;border-radius:4px;background:var(--cream-dark);overflow:hidden;margin-top:.4rem}
+    .occ-fill{height:100%;border-radius:4px;background:var(--green)}
+    .van-occ{background:#fff;border-radius:var(--r);padding:.85rem 1rem;box-shadow:var(--shadow-sm);margin-bottom:.55rem}
+    .van-occ-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+    .van-occ-name{font-size:.82rem;font-weight:700}
+  </style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-logo">🚐</div>
+    <h1>Color Wagon Admin</h1>
+    <p id="lockSubtitle">Enter your PIN to continue</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+    </div>
+    <div id="lockError"></div>
+    <div class="pin-pad" id="pinPad"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" hidden>
+  <header class="app-header">
+    <div><h2 id="hdrTitle">Dashboard</h2></div>
+    <div class="hdr-right">
+      <span class="hdr-badge" id="connBadge">⏳ Connecting</span>
+      <button class="hdr-btn" onclick="Auth.lock()">Lock</button>
+    </div>
+  </header>
+  <main id="mainContent">
+    <div class="tab active" id="tab-overview"><div id="ovContent"></div></div>
+    <div class="tab" id="tab-calendar"><div id="calContent"></div></div>
+    <div class="tab" id="tab-bookings"><div id="bkContent"></div></div>
+    <div class="tab" id="tab-analytics"><div id="anContent"></div></div>
+    <div class="tab" id="tab-settings"><div id="stContent"></div></div>
+  </main>
+  <nav id="nav">
+    <button class="nb active" id="nb-overview" onclick="goTab('overview',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nb" id="nb-calendar" onclick="goTab('calendar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Calendar</span>
+    </button>
+    <button class="nb" id="nb-bookings" onclick="goTab('bookings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Bookings</span>
+    </button>
+    <button class="nb" id="nb-analytics" onclick="goTab('analytics',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Stats</span>
+    </button>
+    <button class="nb" id="nb-settings" onclick="goTab('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+</div>
+
+<button id="fab" onclick="openAddModal()">+</button>
+<div class="backdrop" id="backdrop"><div class="sheet"><div class="handle"></div><div id="modalBody"></div></div></div>
+<div id="toast"></div>
+
+<script>
+/* ==========================================================
+   CWR ADMIN — Supabase-backed real-time dashboard
+   ========================================================== */
+
+// ── CONSTANTS ───────────────────────────────────────────────
+const UNITS={
+  gertrude:{name:'Gertrude', emoji:'🍂',color:'#C2700E',soft:'#FFF1DC',priced:true},
+  violet:  {name:'Violet',   emoji:'🐸',color:'#7C3AED',soft:'#F3EDFF',priced:true},
+  trailer: {name:'The Trailer',emoji:'🏕️',color:'#B45309',soft:'#FEF3C7',priced:false},
+};
+const NIGHTLY=99,WEEKLY=650;
+function calcPrice(n){const w=Math.floor(n/7),r=n%7;return w*WEEKLY+Math.min(r*NIGHTLY,WEEKLY);}
+function nightsBetween(s,e){return Math.max(0,Math.round((new Date(e+'T00:00:00')-new Date(s+'T00:00:00'))/86400000));}
+function today(){return new Date().toISOString().split('T')[0];}
+function fmt(s,yr){const d=new Date(s+'T00:00:00');return d.toLocaleDateString('en-US',yr?{month:'short',day:'numeric',year:'numeric'}:{month:'short',day:'numeric'});}
+
+// ── SUPABASE / STORE ─────────────────────────────────────────
+let _sb=null;       // Supabase client
+let _cache=[];      // In-memory booking cache (used by all render functions synchronously)
+let _sbReady=false; // True once Supabase is connected
+
+function sbCfg(){
+  const url=localStorage.getItem('cwrSupabaseUrl'),key=localStorage.getItem('cwrSupabaseKey');
+  return(url&&key)?{url,key}:null;
+}
+
+async function initSupabase(){
+  const cfg=sbCfg();
+  if(!cfg||typeof supabase==='undefined'){
+    _cache=localFallback();
+    updateConnBadge(false);
+    return;
+  }
+  try{
+    _sb=supabase.createClient(cfg.url,cfg.key);
+    await refreshCache();
+    _sbReady=true;
+    updateConnBadge(true);
+
+    // Real-time: re-fetch and re-render on any change
+    _sb.channel('cwr-admin').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},async()=>{
+      await refreshCache();
+      reRenderCurrent();
+    }).subscribe();
+  }catch(e){
+    console.warn('Supabase init failed:',e);
+    _cache=localFallback();
+    updateConnBadge(false,'error');
+  }
+}
+
+async function refreshCache(){
+  if(!_sb) return;
+  const{data,error}=await _sb.from('bookings').select('*').order('start_date');
+  if(!error&&data) _cache=data.map(b=>({...b,start:b.start_date,end:b.end_date}));
+}
+
+// Fallback when Supabase isn't configured: merge static file + localStorage
+function localFallback(){
+  const real=(typeof CWR_BOOKED_DATES!=='undefined'?CWR_BOOKED_DATES:[])
+    .map((b,i)=>({...b,id:'s-'+i,source:'static',status:'confirmed'}));
+  let admin=[],cust=[];
+  try{const d=JSON.parse(localStorage.getItem('cwrAdminData')||'{}');admin=d.bookings||[];}catch{}
+  try{cust=JSON.parse(localStorage.getItem('cwrBookings')||'[]').map(b=>({...b,source:'customer',status:b.status||'pending'}));}catch{}
+  return[...real,...admin,...cust];
+}
+
+// Synchronous Store (render functions use _cache directly)
+const Store={
+  all(){return _cache;},
+  upcoming(n=5){const t=today();return _cache.filter(b=>b.end>=t&&b.status!=='declined').sort((a,b)=>a.start.localeCompare(b.start)).slice(0,n);},
+
+  async add(b){
+    if(_sb){
+      const{error}=await _sb.from('bookings').insert({
+        unit:b.unit,start_date:b.start,end_date:b.end,status:b.status||'confirmed',
+        customer_name:b.name||null,customer_email:b.email||null,customer_phone:b.phone||null,
+        notes:b.notes||null,source:'admin'
+      });
+      if(error) throw error;
+      await refreshCache();
+    }else{
+      const d=JSON.parse(localStorage.getItem('cwrAdminData')||'{"bookings":[]}');
+      d.bookings.push({...b,id:'a-'+Date.now(),source:'admin',status:'confirmed',createdAt:new Date().toISOString()});
+      localStorage.setItem('cwrAdminData',JSON.stringify(d));
+      _cache=localFallback();
+    }
+  },
+
+  async del(id){
+    if(_sb){
+      await _sb.from('bookings').delete().eq('id',id);
+      await refreshCache();
+    }else{
+      const d=JSON.parse(localStorage.getItem('cwrAdminData')||'{"bookings":[]}');
+      d.bookings=d.bookings.filter(b=>b.id!==id);
+      localStorage.setItem('cwrAdminData',JSON.stringify(d));
+      try{const r=JSON.parse(localStorage.getItem('cwrBookings')||'[]').filter(b=>b.id!==id);localStorage.setItem('cwrBookings',JSON.stringify(r));}catch{}
+      _cache=localFallback();
+    }
+  },
+
+  async setStatus(id,status){
+    if(_sb){
+      await _sb.from('bookings').update({status}).eq('id',id);
+      await refreshCache();
+    }else{
+      const d=JSON.parse(localStorage.getItem('cwrAdminData')||'{"bookings":[]}');
+      const i=d.bookings.findIndex(b=>b.id===id);
+      if(i>=0){d.bookings[i].status=status;localStorage.setItem('cwrAdminData',JSON.stringify(d));}
+      try{const r=JSON.parse(localStorage.getItem('cwrBookings')||'[]');const j=r.findIndex(b=>b.id===id);if(j>=0){r[j].status=status;localStorage.setItem('cwrBookings',JSON.stringify(r));}}catch{}
+      _cache=localFallback();
+    }
+  },
+
+  async migrate(){
+    if(!_sb) return 0;
+    const existing=new Set(_cache.filter(b=>b.source==='admin').map(b=>b.unit+'|'+b.start_date+'|'+b.end_date));
+    const toInsert=(typeof CWR_BOOKED_DATES!=='undefined'?CWR_BOOKED_DATES:[])
+      .filter(b=>!existing.has(b.unit+'|'+b.start+'|'+b.end))
+      .map(b=>({unit:b.unit,start_date:b.start,end_date:b.end,status:'confirmed',source:'migrated'}));
+    if(!toInsert.length) return 0;
+    await _sb.from('bookings').insert(toInsert);
+    await refreshCache();
+    return toInsert.length;
+  }
+};
+
+// ── CONNECTION BADGE ──────────────────────────────────────────
+function updateConnBadge(live, state=''){
+  const el=document.getElementById('connBadge');
+  if(!el) return;
+  if(live){el.textContent='🟢 Live';el.className='hdr-badge live';}
+  else if(state==='error'){el.textContent='⚠️ Error';el.className='hdr-badge offline';}
+  else{el.textContent='💾 Local';el.className='hdr-badge offline';}
+}
+
+// ── AUTH (PIN) ──────────────────────────────────────────────
+const Auth=(()=>{
+  let pin='',setting=false,temp='';
+  const stored=()=>localStorage.getItem('cwrPin');
+  function dots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pin.length);}
+  function key(k){
+    const err=document.getElementById('lockError');
+    if(k==='⌫'){pin=pin.slice(0,-1);dots();err.textContent='';return;}
+    if(pin.length>=4)return;
+    pin+=k;dots();
+    if(pin.length<4)return;
+    setTimeout(()=>{
+      if(setting){
+        if(!temp){temp=pin;pin='';dots();document.getElementById('lockSubtitle').textContent='Confirm your PIN';err.textContent='';}
+        else if(pin===temp){localStorage.setItem('cwrPin',pin);setting=false;temp='';unlock();}
+        else{err.textContent='PINs did not match.';pin='';temp='';dots();document.getElementById('lockSubtitle').textContent='Set a 4-digit PIN';}
+      }else if(!stored()){temp=pin;setting=true;pin='';dots();document.getElementById('lockSubtitle').textContent='Confirm your PIN';err.textContent='';}
+      else if(pin===stored()){unlock();}
+      else{err.textContent='Incorrect PIN.';if(navigator.vibrate)navigator.vibrate([50,30,50]);pin='';dots();}
+    },120);
+  }
+  async function unlock(){
+    pin='';
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('app').hidden=false;
+    await initSupabase();
+    renderOverview();
+  }
+  function lock(){pin='';document.getElementById('lockScreen').style.display='flex';document.getElementById('app').hidden=true;dots();document.getElementById('lockError').textContent='';}
+  function changePin(){setting=true;temp='';pin='';document.getElementById('lockSubtitle').textContent='Set a new 4-digit PIN';lock();}
+  function init(){
+    const pad=document.getElementById('pinPad');
+    [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k=>{
+      const b=document.createElement('button');
+      b.className='pin-key'+(k===''?' empty':k==='⌫'?' del':'');
+      b.textContent=k;if(k!=='')b.onclick=()=>key(String(k));
+      pad.appendChild(b);
+    });
+    if(!stored()){setting=true;document.getElementById('lockSubtitle').textContent='Welcome! Set a 4-digit PIN to protect your dashboard';}
+  }
+  return{init,lock,changePin};
+})();
+
+// ── TAB NAV ──────────────────────────────────────────────────
+let curTab='overview';
+const tabTitles={overview:'Dashboard',calendar:'Calendar',bookings:'Bookings',analytics:'Analytics',settings:'Settings'};
+function goTab(name,btn){
+  document.getElementById('tab-'+curTab).classList.remove('active');
+  document.querySelector('.nb.active')?.classList.remove('active');
+  curTab=name;
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  document.getElementById('hdrTitle').textContent=tabTitles[name];
+  document.getElementById('fab').style.display='none';
+  ({overview:renderOverview,calendar:renderCalendar,bookings:renderBookings,analytics:renderAnalytics,settings:renderSettings})[name]();
+}
+function reRenderCurrent(){
+  ({overview:renderOverview,calendar:renderCalendar,bookings:renderBookings,analytics:renderAnalytics,settings:renderSettings})[curTab]?.();
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(html){document.getElementById('modalBody').innerHTML=html;document.getElementById('backdrop').classList.add('open');}
+function closeModal(){document.getElementById('backdrop').classList.remove('open');}
+document.getElementById('backdrop').addEventListener('click',e=>{if(e.target===document.getElementById('backdrop'))closeModal();});
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ── BOOKING CARD ──────────────────────────────────────────────
+function bkCard(b,style=''){
+  const u=UNITS[b.unit]||{name:b.unit,emoji:'?',color:'#999',priced:false};
+  const n=nightsBetween(b.start,b.end);
+  const p=u.priced?'$'+calcPrice(n).toLocaleString():'Call';
+  const who=b.customer_name||b.name||'';
+  const src=b.source==='migrated'||b.source==='static'?'Published':b.source==='customer'?'Request':'Added';
+  const bdgCls=b.status==='confirmed'?'b-confirmed':b.status==='declined'?'b-declined':'b-pending';
+  const bdgTxt=b.status==='confirmed'?'Confirmed':b.status==='declined'?'Declined':'Pending';
+  return`<div class="bc" data-id="${b.id}" style="${style}">
+    <div class="bc-bar" style="background:${u.color}"></div>
+    <div class="bc-info">
+      <div class="bc-unit ${b.unit}">${u.emoji} ${u.name}</div>
+      <div class="bc-dates">${fmt(b.start)} → ${fmt(b.end)}</div>
+      <div class="bc-meta">${who?who+' · ':''}${src} <span class="badge ${bdgCls}">${bdgTxt}</span></div>
+    </div>
+    <div class="bc-right"><div class="bc-nights">${n}n</div><div class="bc-price">${p}</div></div>
+  </div>`;
+}
+function attachClicks(el){(el||document).querySelectorAll('.bc[data-id]').forEach(c=>c.addEventListener('click',()=>openBookingDetail(c.dataset.id)));}
+
+// ── BOOKING DETAIL MODAL ──────────────────────────────────────
+function openBookingDetail(id){
+  const b=Store.all().find(x=>String(x.id)===String(id));if(!b)return;
+  const u=UNITS[b.unit]||{name:b.unit,emoji:'?',priced:false};
+  const n=nightsBetween(b.start,b.end);
+  const name=b.customer_name||b.name||'';
+  const email=b.customer_email||b.email||'';
+  const phone=b.customer_phone||b.phone||'';
+  const isPublished=b.source==='static'||b.source==='migrated';
+  const row=(l,v)=>`<div style="display:flex;justify-content:space-between;padding:.38rem 0;border-bottom:1px solid var(--cream-dark)"><span style="color:var(--gray);font-size:.8rem">${l}</span><strong style="font-size:.85rem;text-align:right;max-width:65%">${v}</strong></div>`;
+  openModal(`
+    <div class="m-title">${u.emoji} ${u.name}</div>
+    <div style="margin-bottom:1.1rem">
+      ${row('Dates',fmt(b.start,true)+' – '+fmt(b.end,true))}
+      ${row('Duration',n+' night'+(n!==1?'s':''))}
+      ${u.priced?row('Est. Price','$'+calcPrice(n).toLocaleString()):''}
+      ${name?row('Guest',name):''}
+      ${email?row('Email',`<a href="mailto:${email}" style="color:var(--green)">${email}</a>`):''}
+      ${phone?row('Phone',`<a href="tel:${phone}" style="color:var(--green)">${phone}</a>`):''}
+      ${b.group_size||b.groupSize?row('Group',(b.group_size||b.groupSize)+' travelers'):''}
+      ${b.notes?row('Notes',b.notes):''}
+    </div>
+    ${b.status==='pending'?`<div class="btn-row"><button class="btn btn-p" onclick="doStatus('${b.id}','confirmed')">✓ Confirm</button><button class="btn btn-d" onclick="doStatus('${b.id}','declined')">✕ Decline</button></div>`:''}
+    ${!isPublished?`<button class="btn btn-o" style="margin-top:.65rem;color:var(--red);border-color:var(--red)" onclick="doDel('${b.id}')">Delete Booking</button>`:`<p style="font-size:.72rem;color:var(--gray);text-align:center;margin-top:.9rem">This came from the original bookings file. To remove it from the live site, delete it here — then in Settings export a backup file to replace bookings-data.js.</p>`}
+  `);
+}
+
+async function doStatus(id,status){
+  try{await Store.setStatus(id,status);}catch(e){showToast('Error: '+e.message);return;}
+  closeModal();showToast(status==='confirmed'?'Booking confirmed!':'Booking declined.');renderOverview();
+}
+async function doDel(id){
+  if(!confirm('Delete this booking permanently?'))return;
+  try{await Store.del(id);}catch(e){showToast('Error: '+e.message);return;}
+  closeModal();showToast('Deleted.');renderBookings();
+}
+
+// ── ADD BOOKING MODAL ─────────────────────────────────────────
+let _van=null;
+function openAddModal(preDate=''){
+  _van=null;
+  const tmr=new Date();tmr.setDate(tmr.getDate()+1);
+  const tStr=tmr.toISOString().split('T')[0];
+  openModal(`
+    <div class="m-title">Add Booking</div>
+    <div class="fg"><label class="fl">Vehicle</label>
+      <div class="van-row">${Object.entries(UNITS).map(([k,u])=>`<button class="vb" data-v="${k}" onclick="pickVan(this,'${k}')">${u.emoji} ${u.name}</button>`).join('')}</div>
+    </div>
+    <div class="fg"><label class="fl">Pickup Date</label><input class="fi" type="date" id="aStart" value="${preDate||today()}" min="${today()}"></div>
+    <div class="fg"><label class="fl">Return Date</label><input class="fi" type="date" id="aEnd" value="${preDate||tStr}" min="${tStr}"></div>
+    <div class="fg"><label class="fl">Guest Name (optional)</label><input class="fi" type="text" id="aName" placeholder="e.g. Smith Family"></div>
+    <div class="fg"><label class="fl">Email (optional)</label><input class="fi" type="email" id="aEmail" placeholder="guest@email.com"></div>
+    <div class="fg"><label class="fl">Phone (optional)</label><input class="fi" type="tel" id="aPhone" placeholder="(555) 000-0000"></div>
+    <div class="fg"><label class="fl">Notes (optional)</label><input class="fi" type="text" id="aNotes" placeholder="e.g. Deposit received"></div>
+    <div id="aErr" style="color:var(--red);font-size:.78rem;min-height:1rem;margin-bottom:.4rem"></div>
+    <div class="btn-row"><button class="btn btn-o" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="saveNewBooking()">Save Booking</button></div>
+  `);
+  document.getElementById('aStart').addEventListener('change',e=>{
+    const el=document.getElementById('aEnd');
+    if(!el.value||el.value<=e.target.value){const d=new Date(e.target.value+'T00:00:00');d.setDate(d.getDate()+1);el.value=d.toISOString().split('T')[0];}
+  });
+}
+
+function pickVan(el,van){
+  _van=van;
+  document.querySelectorAll('.vb').forEach(b=>{b.className='vb';});
+  el.classList.add({gertrude:'g',violet:'v',trailer:'t'}[van]);
+}
+
+async function saveNewBooking(){
+  const s=document.getElementById('aStart').value,e=document.getElementById('aEnd').value;
+  const err=document.getElementById('aErr');
+  if(!_van){err.textContent='Please select a vehicle.';return;}
+  if(!s){err.textContent='Please enter a pickup date.';return;}
+  if(!e||e<=s){err.textContent='Return must be after pickup.';return;}
+  try{
+    await Store.add({unit:_van,start:s,end:e,status:'confirmed',
+      name:document.getElementById('aName').value.trim(),
+      email:document.getElementById('aEmail').value.trim(),
+      phone:document.getElementById('aPhone').value.trim(),
+      notes:document.getElementById('aNotes').value.trim()});
+  }catch(ex){err.textContent='Save failed: '+ex.message;return;}
+  _van=null;closeModal();showToast(_sbReady?'Saved — live everywhere!':'Saved locally.');
+  curTab==='calendar'?renderCalendar():curTab==='bookings'?renderBookings():renderOverview();
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────
+function renderOverview(){
+  document.getElementById('fab').style.display='none';
+  const t=today(),all=Store.all();
+  const mo=t.slice(0,7);
+  const active=all.filter(b=>b.start<=t&&b.end>=t&&b.status!=='declined');
+  const pending=all.filter(b=>b.status==='pending');
+  const upcoming=Store.upcoming(3);
+  let rev=0;
+  all.filter(b=>b.status!=='declined'&&(b.start_date||b.start||'').slice(0,7)===mo&&UNITS[b.unit]?.priced)
+     .forEach(b=>rev+=calcPrice(nightsBetween(b.start,b.end)));
+  const now=new Date();
+  const dIM=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const ds=new Set();
+  all.filter(b=>b.status!=='declined'&&(b.unit==='gertrude'||b.unit==='violet')&&((b.start||'').startsWith(mo)||(b.end||'').startsWith(mo)))
+     .forEach(b=>{for(let d=new Date(b.start+'T00:00:00');d.toISOString().split('T')[0]<=b.end;d.setDate(d.getDate()+1)){const k=d.toISOString().split('T')[0];if(k.startsWith(mo))ds.add(k+b.unit);}});
+  const occ=Math.min(100,Math.round(ds.size/(dIM*2)*100));
+  const h=now.getHours();
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const upHtml=upcoming.length?upcoming.map(b=>bkCard(b)).join(''):`<div class="empty"><div class="empty-icon">🌿</div>No upcoming bookings</div>`;
+  document.getElementById('ovContent').innerHTML=`
+    <div class="greeting"><h3>${greet}! 👋</h3><p>${now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</p></div>
+    <div class="stats-grid">
+      <div class="stat"><div class="lbl">Out Now</div><div class="val">${active.length}</div><div class="sub">van${active.length!==1?'s':''} rented</div></div>
+      <div class="stat"><div class="lbl">Pending</div><div class="val" style="color:var(--gertrude)">${pending.length}</div><div class="sub">request${pending.length!==1?'s':''}</div></div>
+      <div class="stat"><div class="lbl">Revenue</div><div class="val" style="color:var(--green-dark)">$${rev.toLocaleString()}</div><div class="sub">est. this month</div></div>
+      <div class="stat"><div class="lbl">Occupancy</div><div class="val" style="color:var(--violet)">${occ}%</div><div class="sub">this month</div></div>
+    </div>
+    ${pending.length?`<div class="sec-hdr"><span class="sec-title">⚡ Pending Requests</span></div>${pending.slice(0,3).map(b=>bkCard(b)).join('')}`:''}
+    <div class="sec-hdr"><span class="sec-title">Upcoming</span><button class="txt-btn" onclick="goTab('bookings',document.getElementById('nb-bookings'))">See all</button></div>
+    ${upHtml}
+    <div style="height:80px"></div>`;
+  attachClicks(document.getElementById('ovContent'));
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
+
+function bookedMap(y,m){
+  const map={};
+  Store.all().filter(b=>b.status!=='declined').forEach(b=>{
+    for(let d=new Date(b.start+'T00:00:00');d.toISOString().split('T')[0]<=b.end;d.setDate(d.getDate()+1)){
+      if(d.getFullYear()===y&&d.getMonth()===m){const k=d.toISOString().split('T')[0];if(!map[k])map[k]=new Set();map[k].add(b.unit);}
+    }
+  });
+  return map;
+}
+
+function renderCalendar(){
+  document.getElementById('fab').style.display='none';
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const map=bookedMap(calY,calM),t=today();
+  const first=new Date(calY,calM,1).getDay(),dim=new Date(calY,calM+1,0).getDate(),pDim=new Date(calY,calM,0).getDate();
+  let cells='';
+  for(let i=first-1;i>=0;i--)cells+=`<div class="cd other past"><span class="cd-n">${pDim-i}</span></div>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const us=map[ds]||new Set();
+    const g=us.has('gertrude'),v=us.has('violet'),tr=us.has('trailer');
+    const bg=g&&v?'bg-gv':g?'bg-g':v?'bg-v':tr?'bg-t':'';
+    const dots=[g?`<div class="cd-dot" style="background:var(--gertrude)"></div>`:''
+               ,v?`<div class="cd-dot" style="background:var(--violet)"></div>`:''
+               ,tr?`<div class="cd-dot" style="background:var(--trailer)"></div>`:''].join('');
+    const isT=ds===t,isP=ds<t;
+    cells+=`<div class="cd ${bg} ${isT?'istoday':''} ${isP?'past':''}" ${!isP?`onclick="calClick('${ds}')"`:''}><span class="cd-n">${d}</span>${dots?`<div class="cd-dots">${dots}</div>`:''}</div>`;
+  }
+  const rem=42-(first+dim);for(let d=1;d<=rem;d++)cells+=`<div class="cd other"><span class="cd-n">${d}</span></div>`;
+  document.getElementById('calContent').innerHTML=`
+    <div class="cal-hdr">
+      <button class="cal-nav" onclick="calNav(-1)">‹</button>
+      <span class="cal-mo">${MONTHS[calM]} ${calY}</span>
+      <button class="cal-nav" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--gertrude)"></div>Gertrude</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--violet)"></div>Violet</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--trailer)"></div>Trailer</div>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-wk">${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div class="cal-wd">${d}</div>`).join('')}</div>
+      <div class="cal-days">${cells}</div>
+    </div>
+    <div style="text-align:center;margin-top:.9rem">
+      <button class="btn btn-p btn-sm" onclick="openAddModal()">+ Add Booking</button>
+    </div>
+    <div style="height:80px"></div>`;
+}
+function calNav(d){calM+=d;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}renderCalendar();}
+function calClick(ds){
+  const map=bookedMap(calY,calM),us=map[ds];
+  if(us&&us.size){
+    const bks=Store.all().filter(b=>b.start<=ds&&b.end>=ds&&b.status!=='declined');
+    openModal(`<div class="m-title">📅 ${fmt(ds,true)}</div><p style="font-size:.78rem;color:var(--gray);margin-bottom:.75rem">Booked on this date:</p>${bks.map(b=>bkCard(b)).join('')}<button class="btn btn-p" style="margin-top:.8rem" onclick="closeModal();openAddModal('${ds}')">+ Add Another</button>`);
+    attachClicks(document.getElementById('modalBody'));
+  }else{openAddModal(ds);}
+}
+
+// ── BOOKINGS LIST ─────────────────────────────────────────────
+let bkFilter='all';
+function renderBookings(){
+  const t=today(),all=Store.all().filter(b=>bkFilter==='all'||b.unit===bkFilter);
+  const sorted=[...all].sort((a,b)=>{const af=a.end>=t,bf=b.end>=t;if(af&&!bf)return -1;if(!af&&bf)return 1;return af?a.start.localeCompare(b.start):b.start.localeCompare(a.start);});
+  document.getElementById('bkContent').innerHTML=`
+    <div class="pills">${['all','gertrude','violet','trailer'].map(u=>`<button class="pill ${bkFilter===u?'on':''}" onclick="bkFilter='${u}';renderBookings();">${u==='all'?'All':UNITS[u].emoji+' '+UNITS[u].name}</button>`).join('')}</div>
+    ${sorted.length?sorted.map(b=>bkCard(b,b.end<t?'opacity:.5':'')).join(''):`<div class="empty"><div class="empty-icon">📋</div>No bookings</div>`}
+    <div style="height:80px"></div>`;
+  attachClicks(document.getElementById('bkContent'));
+  const fab=document.getElementById('fab');fab.style.display='flex';fab.onclick=openAddModal;
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────
+function renderAnalytics(){
+  document.getElementById('fab').style.display='none';
+  const all=Store.all().filter(b=>b.status!=='declined');
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({y:d.getFullYear(),m:d.getMonth(),label:d.toLocaleDateString('en-US',{month:'short'}),rev:0,n:0});}
+  all.filter(b=>UNITS[b.unit]?.priced).forEach(b=>{
+    const mo=(b.start_date||b.start||'').slice(0,7);
+    const idx=months.findIndex(m=>`${m.y}-${String(m.m+1).padStart(2,'0')}`===mo);
+    if(idx>=0){const n=nightsBetween(b.start,b.end);months[idx].rev+=calcPrice(n);months[idx].n+=n;}
+  });
+  const maxRev=Math.max(1,...months.map(m=>m.rev));
+  const vanStats=Object.entries(UNITS).map(([k,u])=>{
+    const vb=all.filter(b=>b.unit===k);
+    const tn=vb.reduce((s,b)=>s+nightsBetween(b.start,b.end),0);
+    const rev=u.priced?vb.reduce((s,b)=>s+calcPrice(nightsBetween(b.start,b.end)),0):null;
+    return{k,u,tn,rev,occ:Math.min(100,Math.round(tn/365*100)),count:vb.length};
+  });
+  const totalRev=all.filter(b=>UNITS[b.unit]?.priced).reduce((s,b)=>s+calcPrice(nightsBetween(b.start,b.end)),0);
+  document.getElementById('anContent').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat"><div class="lbl">All Time Revenue</div><div class="val" style="color:var(--green-dark)">$${totalRev.toLocaleString()}</div><div class="sub">estimated</div></div>
+      <div class="stat"><div class="lbl">Total Bookings</div><div class="val">${all.length}</div><div class="sub">all time</div></div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Monthly Revenue</span></div>
+    <div style="background:#fff;border-radius:var(--r);padding:1rem;box-shadow:var(--shadow-sm);margin-bottom:.9rem">
+      <div style="display:flex;align-items:flex-end;gap:6px;height:100px">
+        ${months.map(m=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;background:var(--green);border-radius:4px 4px 0 0;height:${m.rev?Math.max(6,Math.round(m.rev/maxRev*80)):0}px"></div></div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--gray)">${m.label}</div>
+          ${m.rev?`<div style="font-size:.58rem;color:var(--green-dark);font-weight:800">$${(m.rev/1000).toFixed(1)}k</div>`:'<div style="font-size:.58rem;color:var(--cream-dark)">—</div>'}
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Van Utilization</span></div>
+    ${vanStats.map(s=>`<div class="van-occ">
+      <div class="van-occ-hdr">
+        <span class="van-occ-name" style="color:${s.u.color}">${s.u.emoji} ${s.u.name}</span>
+        <span style="font-size:.72rem;color:var(--gray)">${s.count} bookings · ${s.tn} nights${s.rev!==null?' · $'+s.rev.toLocaleString():''}</span>
+      </div>
+      <div class="occ-bar"><div class="occ-fill" style="width:${s.occ}%;background:${s.u.color}"></div></div>
+    </div>`).join('')}
+    <div style="height:80px"></div>`;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+function renderSettings(){
+  document.getElementById('fab').style.display='none';
+  const cfg=sbCfg();
+  document.getElementById('stContent').innerHTML=`
+    <div style="margin-bottom:.7rem"><div class="sec-title">Database Connection</div></div>
+    ${_sbReady
+      ?`<div class="conn-banner live">🟢 Connected to Supabase — changes go live instantly for everyone</div>`
+      :`<div class="conn-banner setup">💡 ${cfg?'Connecting…':'Set up Supabase to enable real-time sync across all devices'}</div>`}
+    <div class="sset">
+      <div class="srow" onclick="openSupabaseSetup()"><div class="sicon">🗄️</div><div class="slbl"><strong>${cfg?'Supabase Settings':'Connect Supabase'}</strong><span>${cfg?'Change URL or API key':'One-time setup for real-time sync'}</span></div><div class="schev">›</div></div>
+      ${cfg?`<div class="srow" onclick="doMigrate()"><div class="sicon">📤</div><div class="slbl"><strong>Migrate Existing Bookings</strong><span>Import bookings-data.js into Supabase</span></div><div class="schev">›</div></div>`:''}
+    </div>
+
+    <div style="margin-bottom:.7rem"><div class="sec-title">Security</div></div>
+    <div class="sset">
+      <div class="srow" onclick="Auth.changePin()"><div class="sicon">🔑</div><div class="slbl"><strong>Change PIN</strong><span>Update your lock PIN</span></div><div class="schev">›</div></div>
+      <div class="srow" onclick="Auth.lock()"><div class="sicon">🔒</div><div class="slbl"><strong>Lock Dashboard</strong></div><div class="schev">›</div></div>
+    </div>
+
+    <div style="margin-bottom:.7rem"><div class="sec-title">Backup Export</div></div>
+    <div class="sset">
+      <div class="srow" onclick="doExport()"><div class="sicon">📥</div><div class="slbl"><strong>Download bookings-data.js</strong><span>Backup of all confirmed bookings</span></div><div class="schev">›</div></div>
+    </div>
+
+    <div style="margin-bottom:.7rem"><div class="sec-title">Links</div></div>
+    <div class="sset">
+      <div class="srow" onclick="window.open('https://app.netlify.com','_blank')"><div class="sicon">🌐</div><div class="slbl"><strong>Netlify Dashboard</strong><span>Form submissions &amp; deployments</span></div><div class="schev">›</div></div>
+      <div class="srow" onclick="window.open('https://supabase.com/dashboard','_blank')"><div class="sicon">🗄️</div><div class="slbl"><strong>Supabase Dashboard</strong><span>View &amp; edit data directly</span></div><div class="schev">›</div></div>
+      <div class="srow" onclick="window.open('https://www.colorwagonrentals.com','_blank')"><div class="sicon">🚐</div><div class="slbl"><strong>Live Website</strong></div><div class="schev">›</div></div>
+    </div>
+    <div style="height:80px"></div>`;
+}
+
+function openSupabaseSetup(){
+  const cfg=sbCfg();
+  openModal(`
+    <div class="m-title">🗄️ Supabase Setup</div>
+    <p style="font-size:.8rem;color:var(--gray);margin-bottom:1rem">Connect a free Supabase database so bookings sync instantly across all phones and devices — no publishing step needed.</p>
+    <div style="background:var(--blue-soft);border-radius:var(--r-sm);padding:.75rem;margin-bottom:1rem;font-size:.75rem;color:var(--blue);line-height:1.6">
+      <strong>One-time setup (5 min):</strong><br>
+      1. Go to <strong>supabase.com</strong> → New project<br>
+      2. SQL Editor → paste the table setup script<br>
+      3. Settings → API → copy URL &amp; anon key<br>
+      4. Paste them below
+    </div>
+    <div class="fg"><label class="fl">Project URL</label><input class="fi" type="url" id="sbUrl" value="${cfg?localStorage.getItem('cwrSupabaseUrl'):''}" placeholder="https://xxxx.supabase.co"></div>
+    <div class="fg"><label class="fl">Anon (public) Key</label><input class="fi" type="text" id="sbKey" value="${cfg?localStorage.getItem('cwrSupabaseKey'):''}" placeholder="eyJhbGciOiJIUzI1NiIs..."><div class="fi-note">This key is safe to use here — it's designed to be public.</div></div>
+    <div class="fg"><label class="fl">SQL to run in Supabase (copy → paste into SQL Editor)</label>
+      <textarea class="fi" rows="7" onclick="this.select()" style="font-size:.7rem;font-family:monospace;resize:none">CREATE TABLE bookings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  unit TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  customer_name TEXT,
+  customer_email TEXT,
+  customer_phone TEXT,
+  group_size TEXT,
+  notes TEXT,
+  source TEXT DEFAULT 'admin',
+  confirmation_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public access" ON bookings FOR ALL TO anon USING (true) WITH CHECK (true);</textarea>
+    </div>
+    <div id="sbErr" style="color:var(--red);font-size:.78rem;min-height:1rem;margin-bottom:.4rem"></div>
+    <div class="btn-row"><button class="btn btn-o" onclick="closeModal()">Cancel</button><button class="btn btn-b" onclick="saveSupabaseConfig()">Save &amp; Connect</button></div>`);
+}
+
+async function saveSupabaseConfig(){
+  const url=document.getElementById('sbUrl').value.trim().replace(/\/+$/,'');
+  const key=document.getElementById('sbKey').value.trim();
+  const err=document.getElementById('sbErr');
+  if(!url||!key){err.textContent='Please fill in both fields.';return;}
+  if(!url.startsWith('https://')){err.textContent='URL must start with https://';return;}
+
+  // file:// protocol can't make cross-origin requests — save and skip the test
+  if(window.location.protocol==='file:'){
+    localStorage.setItem('cwrSupabaseUrl',url);
+    localStorage.setItem('cwrSupabaseKey',key);
+    err.style.color='var(--blue)';
+    err.textContent='Settings saved. Open this page from your live Netlify site to fully connect — file:// previews can\'t reach external servers.';
+    return;
+  }
+
+  err.style.color='var(--gray)';
+  err.textContent='Testing connection…';
+  try{
+    const client=supabase.createClient(url,key);
+    const{error}=await client.from('bookings').select('id').limit(1);
+    // 42P01 = table doesn't exist yet (SQL not run) — still a valid connection
+    if(error&&error.code!=='PGRST116'&&error.code!=='42P01'){throw error;}
+    if(error?.code==='42P01'){
+      err.style.color='var(--gertrude)';
+      err.textContent='Connected! But the bookings table doesn\'t exist yet — paste and run the SQL above in your Supabase SQL Editor first.';
+    }else{
+      err.style.color='';err.textContent='';
+    }
+    localStorage.setItem('cwrSupabaseUrl',url);
+    localStorage.setItem('cwrSupabaseKey',key);
+    _sb=null;_sbReady=false;
+    if(!error){closeModal();showToast('Connecting…');}
+    await initSupabase();
+    if(!error){renderSettings();showToast(_sbReady?'Connected — live sync active!':'Saved, but connection issue — check your URL.');}
+  }catch(e){
+    err.style.color='var(--red)';
+    if(e instanceof TypeError&&e.message.toLowerCase().includes('fetch')){
+      err.textContent='Network error — could not reach Supabase. Double-check the Project URL (should be https://xxxx.supabase.co) and your internet connection.';
+    }else{
+      err.textContent='Connection failed: '+(e.message||'Check URL and anon key.');
+    }
+  }
+}
+
+async function doMigrate(){
+  if(!_sb){showToast('Connect Supabase first.');return;}
+  if(!confirm('Import all bookings from bookings-data.js into Supabase? Duplicates will be skipped.'))return;
+  showToast('Migrating…');
+  const n=await Store.migrate();
+  showToast(n>0?`Imported ${n} bookings!`:'Nothing new to import.');
+  renderOverview();
+}
+
+function doExport(){
+  const seen=new Set();
+  const lines=Store.all().filter(b=>b.status!=='declined'&&(b.source!=='customer'||b.status==='confirmed'))
+    .map(b=>({unit:b.unit,start:b.start_date||b.start,end:b.end_date||b.end}))
+    .sort((a,b)=>a.start.localeCompare(b.start))
+    .filter(b=>{const k=b.unit+'|'+b.start+'|'+b.end;if(seen.has(k))return false;seen.add(k);return true;})
+    .map(b=>`  { unit: '${b.unit}', start: '${b.start}', end: '${b.end}' },`).join('\n');
+  const content=`/* COLOR WAGON RENTALS — Backup export ${new Date().toLocaleDateString()} */\nconst CWR_BOOKED_DATES = [\n${lines}\n];\n`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'text/javascript'}));a.download='bookings-data.js';a.click();
+  showToast('Backup downloaded!');
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+Auth.init();
+</script>
+</body>
+</html>

@@ -28,13 +28,56 @@ const state = {
   groupSize: '', destination: '', specialRequests: ''
 };
 
-// ---- Bookings: real dates from bookings-data.js + pending requests saved in this browser ----
+// ---- Supabase real-time sync ----------------------------------------
+let _sbCache = null; // null = not loaded yet; [] = loaded (may be empty)
+let _sbClient = null;
+
+function _sbCfg() {
+  const url = localStorage.getItem('cwrSupabaseUrl');
+  const key = localStorage.getItem('cwrSupabaseKey');
+  return (url && key) ? { url, key } : null;
+}
+
+async function _fetchSb() {
+  if (!_sbClient) return;
+  const { data, error } = await _sbClient.from('bookings')
+    .select('*').neq('status', 'declined');
+  if (!error && data) {
+    _sbCache = data.map(b => ({ ...b, start: b.start_date, end: b.end_date }));
+    // Refresh calendar and conflict check with new data
+    if (fullCalendar) {
+      fullCalendar.removeAllEvents();
+      fullCalendar.addEventSource(getCalendarEvents(activeFilter));
+    }
+    checkDateAvailability();
+  }
+}
+
+function _initSupabase() {
+  const cfg = _sbCfg();
+  if (!cfg || typeof supabase === 'undefined') return;
+  _sbClient = supabase.createClient(cfg.url, cfg.key);
+  _fetchSb(); // initial load (async — non-blocking)
+  // Real-time subscription: re-fetch whenever any booking changes
+  _sbClient.channel('public-calendar')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, _fetchSb)
+    .subscribe();
+}
+
+// ---- Bookings: Supabase cache (if live) or static + localStorage ----
 function getBookings() {
+  if (_sbCache !== null) return _sbCache;
+  // Fallback while Supabase loads (or if not configured)
   const real = (typeof CWR_BOOKED_DATES !== 'undefined' ? CWR_BOOKED_DATES : [])
     .map((b, i) => ({ id: 'cal-' + i, ...b }));
   const stored = localStorage.getItem('cwrBookings');
   const requests = stored ? JSON.parse(stored) : [];
-  return [...real, ...requests];
+  let adminBks = [];
+  try {
+    const d = JSON.parse(localStorage.getItem('cwrAdminData') || '{}');
+    adminBks = (d.bookings || []).filter(b => b.status !== 'declined');
+  } catch {}
+  return [...real, ...requests, ...adminBks];
 }
 
 function saveBooking(booking) {
@@ -464,6 +507,27 @@ function submitBooking() {
     submittedAt: new Date().toISOString()
   });
 
+  // Write booking request to Supabase so it appears in the admin dashboard instantly.
+  const _cfg = _sbCfg();
+  if (_cfg && typeof supabase !== 'undefined') {
+    try {
+      const _sc = supabase.createClient(_cfg.url, _cfg.key);
+      _sc.from('bookings').insert({
+        unit: state.vehicle,
+        start_date: startStr,
+        end_date: endStr,
+        status: 'pending',
+        customer_name: state.firstName + ' ' + state.lastName,
+        customer_email: state.email,
+        customer_phone: state.phone,
+        group_size: state.groupSize,
+        notes: state.specialRequests || null,
+        source: 'customer',
+        confirmation_id: id
+      }).then(() => _fetchSb()).catch(() => {});
+    } catch {}
+  }
+
   // Deliver the request to Heidi & Will via Netlify Forms (no backend needed).
   // Fails silently if previewing locally — the confirmation still shows and the
   // request is preserved in localStorage above.
@@ -524,4 +588,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initDatePickers();
   renderSteps();
   updateSummary();
+  _initSupabase(); // connect real-time data source (non-blocking)
 });
