@@ -28,7 +28,7 @@ exports.handler = async (event) => {
     return json(200, { bookings });
   } catch (e) {
     // Store not available (e.g. Blobs not enabled) — client falls back to the static list.
-    return json(200, { bookings: [], error: 'store_unavailable', detail: String((e && e.name) || '') + ': ' + String((e && e.message) || e) });
+    return json(200, { bookings: [], error: 'store_unavailable' });
   }
 };
 
