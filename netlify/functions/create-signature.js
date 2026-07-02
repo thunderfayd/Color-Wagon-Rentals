@@ -2,9 +2,9 @@
 // reusable template (which holds the ~12 signature fields across pages).
 //
 // Requires these environment variables in Netlify:
-//   SIGNWELL_API_KEY      — your SignWell API key
-//   SIGNWELL_TEMPLATE_ID  — the template id for the rental agreement
-//   SIGNWELL_TEST_MODE    — "true" while testing (optional)
+//   SIGNWELL_API_KEY      - your SignWell API key
+//   SIGNWELL_TEMPLATE_ID  - the template id for the rental agreement
+//   SIGNWELL_TEST_MODE    - "true" while testing (optional)
 //
 // If the keys aren't set, returns { configured: false } and the booking
 // page shows the "we'll email your agreement" fallback instead.
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
         embedded_signing: true,
         embedded_signing_notifications: true,
         draft: false,
-        subject: 'Color Wagon Rentals — Rental Agreement',
+        subject: 'Color Wagon Rentals: Rental Agreement',
         message: 'Please review and sign your Color Wagon Rentals rental agreement.',
         recipients: [{ id: '1', name: data.name, email: data.email }],
         metadata: {

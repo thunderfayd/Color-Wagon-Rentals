@@ -1,5 +1,5 @@
 /* =============================================
-   Color Wagon Rentals — Booking System
+   Color Wagon Rentals - Booking System
    Real booked dates live in js/bookings-data.js
    ============================================= */
 
@@ -77,7 +77,7 @@ async function loadLiveAvailability() {
       }
       checkDateAvailability();
     }
-  } catch (e) { /* offline / not deployed yet — static fallback stays */ }
+  } catch (e) { /* offline / not deployed yet - static fallback stays */ }
 }
 
 function saveBooking(booking) {
@@ -142,7 +142,7 @@ function initFullCalendar() {
     eventClick(info) {
       const unit = info.event.extendedProps.unit;
       const unitData = UNITS[unit] || {};
-      alert(`${unitData.name || unit} is already booked for those dates.\n\nPlease choose different dates or a different camper — or give us a call, we may be able to work something out!`);
+      alert(`${unitData.name || unit} is already booked for those dates.\n\nPlease choose different dates or a different camper, or give us a call, we may be able to work something out!`);
     },
     dateClick(info) {
       const today = new Date();
@@ -259,7 +259,7 @@ function checkDateAvailability() {
   const extra = nights % 7;
   let txt = `${nights} night${nights > 1 ? 's' : ''}`;
   if (weeks > 0) txt += ` (${weeks} week${weeks > 1 ? 's' : ''}${extra > 0 ? ' + ' + extra + ' night' + (extra > 1 ? 's' : '') : ''})`;
-  if (nightsSummary) nightsSummary.textContent = txt + ' — these dates are open!';
+  if (nightsSummary) nightsSummary.textContent = txt + ': these dates are open!';
 }
 
 // ---- Vehicle Selection ----
@@ -539,7 +539,7 @@ async function initSignature() {
       if (loading) loading.style.display = 'none';
       return;
     }
-  } catch (e) { /* not configured / offline — show the email fallback below */ }
+  } catch (e) { /* not configured / offline - show the email fallback below */ }
   if (loading) loading.style.display = 'none';
   if (fallback) fallback.style.display = 'block';
 }
@@ -577,7 +577,7 @@ function submitBooking() {
   });
 
   // Deliver the request to Heidi & Will via Netlify Forms (no backend needed).
-  // Fails silently if previewing locally — the confirmation still shows and the
+  // Fails silently if previewing locally - the confirmation still shows and the
   // request is preserved in localStorage above.
   const payload = new URLSearchParams({
     'form-name': 'booking',
@@ -601,7 +601,7 @@ function submitBooking() {
     agreement_signed: state.signed ? 'yes' : 'emailed after booking'
   });
   fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
-    .catch(() => { /* offline / local preview — request is still saved locally */ });
+    .catch(() => { /* offline / local preview - request is still saved locally */ });
 
   // Also store the request in the live system so it appears in Heidi & Will's
   // dashboard and can be confirmed with one click. Best-effort; never blocks.
@@ -618,7 +618,7 @@ function submitBooking() {
       destination: state.destination, special_requests: state.specialRequests,
       signed: state.signed, submittedAt: new Date().toISOString()
     })
-  }).catch(() => { /* not deployed yet — request still delivered via Netlify Forms */ });
+  }).catch(() => { /* not deployed yet - request still delivered via Netlify Forms */ });
 
   document.getElementById('confirmationId').textContent = id;
   const emailEl = document.getElementById('confirmEmail');

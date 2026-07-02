@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Booking Dashboard — Color Wagon Rentals</title>
+  <title>Booking Dashboard | Color Wagon Rentals</title>
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,7 +46,7 @@
         <label for="pw">Password</label>
         <input type="password" id="pw" placeholder="••••••••" autocomplete="current-password" />
       </div>
-      <div id="loginError" class="muted" style="color:var(--stripe-red); display:none; margin-bottom:0.75rem;">Incorrect password — try again.</div>
+      <div id="loginError" class="muted" style="color:var(--stripe-red); display:none; margin-bottom:0.75rem;">Incorrect password, try again.</div>
       <button class="btn btn-primary" style="width:100%;" onclick="login()">Log In</button>
     </div>
 
@@ -152,7 +152,7 @@
 
     async function refresh() {
       const { status, data } = await api('list');
-      if (status !== 200) { banner('Session expired — log in again.', false); logout(); return; }
+      if (status !== 200) { banner('Session expired, log in again.', false); logout(); return; }
       renderRequests(data.requests || []);
       renderConfirmed(data.confirmed || []);
     }
@@ -193,7 +193,7 @@
         </div>`).join('');
     }
 
-    async function confirmReq(id) { const { data } = await api('confirm', { id }); banner('Booking confirmed — calendar updated.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
+    async function confirmReq(id) { const { data } = await api('confirm', { id }); banner('Booking confirmed, calendar updated.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
     async function declineReq(id) { const { data } = await api('decline', { id }); banner('Request declined.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
     async function delBooking(id) { const { data } = await api('delete', { id }); banner('Dates freed up.', true); renderConfirmed(data.confirmed||[]); renderRequests(data.requests||[]); }
 

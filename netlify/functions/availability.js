@@ -1,4 +1,4 @@
-// Public availability feed — powers the live booking calendar.
+// Public availability feed - powers the live booking calendar.
 // Returns only { unit, start, end } (no customer info).
 const { getStore, connectLambda } = require('@netlify/blobs');
 
@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     const bookings = confirmed.map((b) => ({ unit: b.unit, start: b.start, end: b.end }));
     return json(200, { bookings });
   } catch (e) {
-    // Store not available (e.g. Blobs not enabled) — client falls back to the static list.
+    // Store not available (e.g. Blobs not enabled) - client falls back to the static list.
     return json(200, { bookings: [], error: 'store_unavailable' });
   }
 };

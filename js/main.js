@@ -1,4 +1,4 @@
-// Nav scroll effect — transparent over the hero, solid once scrolled
+// Nav scroll effect - transparent over the hero, solid once scrolled
 (function () {
   const nav = document.getElementById('mainNav');
   if (!nav) return;
@@ -36,7 +36,7 @@
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', function (e) {
     const href = this.getAttribute('href');
-    if (!href || href === '#') { e.preventDefault(); return; }  // placeholder link — don't jump or crash
+    if (!href || href === '#') { e.preventDefault(); return; }  // placeholder link - don't jump or crash
     const target = document.getElementById(href.slice(1));
     if (target) {
       e.preventDefault();

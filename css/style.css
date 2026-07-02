@@ -1,5 +1,5 @@
 /* ==========================================================
-   COLOR WAGON RENTALS — Design System v2
+   COLOR WAGON RENTALS - Design System v2
    Retro camper-stripe look pulled from the hand-painted logo:
    forest green + cream + the five rainbow stripes.
    ========================================================== */
@@ -82,7 +82,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .skip-link:focus { top: 0; color: var(--white); outline: 3px solid var(--gold); }
 
-/* Keyboard focus ring — only shows for keyboard users, not mouse clicks */
+/* Keyboard focus ring - only shows for keyboard users, not mouse clicks */
 :focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 2px;
@@ -121,7 +121,7 @@ h4 { font-size: 1.1rem; }
 .text-center { text-align: center; }
 .text-center .section-subtitle { margin-left: auto; margin-right: auto; }
 
-/* ---------- Rainbow stripe — the signature ---------- */
+/* ---------- Rainbow stripe - the signature ---------- */
 .stripe,
 .stripe-thin {
   display: block;

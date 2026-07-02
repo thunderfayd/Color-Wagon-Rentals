@@ -1,5 +1,5 @@
 /* ============================================================
-   COLOR WAGON RENTALS — BOOKED DATES
+   COLOR WAGON RENTALS - BOOKED DATES
    ------------------------------------------------------------
    Heidi: this is the ONLY file you need to touch to update the
    booking calendars on the website.
@@ -13,20 +13,20 @@
    ============================================================ */
 
 const CWR_BOOKED_DATES = [
-  // July 1-5 — both vans booked
+  // July 1-5 - both vans booked
   { unit: 'gertrude', start: '2026-07-01', end: '2026-07-05' },
   { unit: 'violet',   start: '2026-07-01', end: '2026-07-05' },
 
-  // July 13-16 — Violet
+  // July 13-16 - Violet
   { unit: 'violet',   start: '2026-07-13', end: '2026-07-16' },
 
-  // July 17-20 — both vans
+  // July 17-20 - both vans
   { unit: 'gertrude', start: '2026-07-17', end: '2026-07-20' },
   { unit: 'violet',   start: '2026-07-17', end: '2026-07-20' },
 
-  // August 12-26 — Violet
+  // August 12-26 - Violet
   { unit: 'violet',   start: '2026-08-12', end: '2026-08-26' },
 
-  // August 14-21 — Gertrude
+  // August 14-21 - Gertrude
   { unit: 'gertrude', start: '2026-08-14', end: '2026-08-21' },
 ];
