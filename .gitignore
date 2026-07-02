@@ -1,6 +1,7 @@
 # Local-only backups of the original full-resolution images (not for deploy)
 _backups/
 New Pictures/
+SS Badger CW Vans.jpg
 *.zip
 
 # Node deps (installed by Netlify at build time)
