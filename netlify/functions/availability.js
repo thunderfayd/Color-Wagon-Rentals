@@ -18,7 +18,7 @@ const SEED = [
 exports.handler = async (event) => {
   try {
     connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
-    const store = getStore({ name: 'colorwagon', consistency: 'strong' });
+    const store = getStore('colorwagon');
     let confirmed = await store.get('confirmed', { type: 'json' });
     if (!Array.isArray(confirmed)) {
       confirmed = SEED.map((b, i) => ({ id: 'S-' + i, ...b }));

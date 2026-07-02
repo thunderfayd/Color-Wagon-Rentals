@@ -10,7 +10,7 @@ exports.handler = async (event) => {
 
   try {
     connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
-    const store = getStore({ name: 'colorwagon', consistency: 'strong' });
+    const store = getStore('colorwagon');
     const requests = (await store.get('requests', { type: 'json' })) || [];
     data.receivedAt = new Date().toISOString();
     data.status = 'pending';

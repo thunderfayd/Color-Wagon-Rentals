@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   if (!body.password || body.password !== pass) return json(401, { error: 'unauthorized' });
 
   connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
-  const store = getStore({ name: 'colorwagon', consistency: 'strong' });
+  const store = getStore('colorwagon');
 
   // Load + normalise (every confirmed booking must have a stable id).
   let confirmed = (await store.get('confirmed', { type: 'json' })) || [];
