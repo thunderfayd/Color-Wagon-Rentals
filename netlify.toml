@@ -4,6 +4,14 @@
 [build]
   publish = "."
   command = ""
+  functions = "netlify/functions"
+
+# Pretty API paths → serverless functions (live availability, booking requests,
+# admin dashboard, and SignWell e-signature).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
 # Long-cache static assets (images, css, js) — they're versioned by content.
 [[headers]]

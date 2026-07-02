@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /_backups/
+Disallow: /OWNER-GUIDE.md
+Disallow: /admin.html
+Disallow: /api/
 
 Sitemap: https://www.colorwagonrentals.com/sitemap.xml

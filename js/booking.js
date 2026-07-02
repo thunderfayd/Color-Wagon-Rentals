@@ -16,6 +16,24 @@ function estimatePrice(nights) {
   return weeks * WEEKLY_RATE + Math.min(rem * NIGHTLY_RATE, WEEKLY_RATE);
 }
 
+// Fees & tax added to every rental.
+const CLEANING_FEE = 50;
+// Wisconsin state sales tax (5%) + Manitowoc County (0.5%).
+const SALES_TAX_RATE = 0.055;
+
+function priceBreakdown(nights) {
+  const base = estimatePrice(nights);
+  const cleaning = CLEANING_FEE;
+  const taxable = base + cleaning;
+  const tax = Math.round(taxable * SALES_TAX_RATE * 100) / 100;
+  const total = Math.round((taxable + tax) * 100) / 100;
+  return { base, cleaning, tax, total };
+}
+
+function money(n) {
+  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // ---- State ----
 const state = {
   step: 1,
@@ -25,16 +43,41 @@ const state = {
   nights: 0,
   firstName: '', lastName: '', email: '', phone: '',
   address: '', dob: '', licenseNum: '', licenseState: '',
-  groupSize: '', destination: '', specialRequests: ''
+  groupSize: '', destination: '', specialRequests: '', signed: false
 };
 
-// ---- Bookings: real dates from bookings-data.js + pending requests saved in this browser ----
+// ---- Bookings: live availability (Netlify) with static fallback + this browser's pending requests ----
+let liveBookings = null; // null until /api/availability responds; array once loaded
+
+function baseBookings() {
+  if (Array.isArray(liveBookings)) return liveBookings;
+  return (typeof CWR_BOOKED_DATES !== 'undefined' ? CWR_BOOKED_DATES : []);
+}
+
 function getBookings() {
-  const real = (typeof CWR_BOOKED_DATES !== 'undefined' ? CWR_BOOKED_DATES : [])
-    .map((b, i) => ({ id: 'cal-' + i, ...b }));
+  const real = baseBookings().map((b, i) => ({ id: 'cal-' + i, ...b }));
   const stored = localStorage.getItem('cwrBookings');
   const requests = stored ? JSON.parse(stored) : [];
   return [...real, ...requests];
+}
+
+// Pull the always-current booked dates from the Netlify function so the
+// calendar live-updates the moment Heidi confirms/cancels in the dashboard.
+// Falls back silently to the static bookings-data.js list if unavailable.
+async function loadLiveAvailability() {
+  try {
+    const res = await fetch('/api/availability', { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data.bookings)) {
+      liveBookings = data.bookings;
+      if (fullCalendar) {
+        fullCalendar.removeAllEvents();
+        fullCalendar.addEventSource(getCalendarEvents(activeFilter));
+      }
+      checkDateAvailability();
+    }
+  } catch (e) { /* offline / not deployed yet — static fallback stays */ }
 }
 
 function saveBooking(booking) {
@@ -345,7 +388,7 @@ function validateStep(step) {
 }
 
 function renderSteps() {
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 6; i++) {
     const panel = document.getElementById('step' + i);
     const dot = document.getElementById('dot' + i);
     const lbl = document.getElementById('lbl' + i);
@@ -356,7 +399,7 @@ function renderSteps() {
       dot.innerHTML = i < state.step ? '' : '<span class="num">' + i + '</span>';
     }
     if (lbl) lbl.classList.toggle('active', i === state.step);
-    if (i < 5) {
+    if (i < 6) {
       const line = document.getElementById('line' + i + (i + 1));
       if (line) line.classList.toggle('done', state.step > i);
     }
@@ -382,6 +425,15 @@ function updateSummary() {
   }
   if (state.firstName) rows.push(['Guest', state.firstName + ' ' + state.lastName]);
 
+  const priced = !!(state.vehicle && state.nights > 0 && UNITS[state.vehicle] && UNITS[state.vehicle].priced);
+  let bd = null;
+  if (priced) {
+    bd = priceBreakdown(state.nights);
+    rows.push(['Rental', money(bd.base)]);
+    rows.push(['Cleaning &amp; prep', money(bd.cleaning)]);
+    rows.push(['Est. WI tax', money(bd.tax)]);
+  }
+
   if (rows.length === 0) {
     body.innerHTML = '<p class="summary-empty">Your booking details will appear here as you complete each step.</p>';
     if (cta) cta.style.display = 'none';
@@ -392,9 +444,9 @@ function updateSummary() {
     `<div class="summary-row"><span class="label">${label}</span><span>${val}</span></div>`
   ).join('');
 
-  if (state.vehicle && state.nights > 0 && UNITS[state.vehicle].priced) {
+  if (priced) {
     if (cta) cta.style.display = 'block';
-    if (total) total.textContent = '$' + estimatePrice(state.nights).toLocaleString();
+    if (total) total.textContent = money(bd.total);
   } else if (cta) {
     cta.style.display = 'none';
   }
@@ -410,7 +462,8 @@ function buildReviewSummary() {
   const el = document.getElementById('review-summary');
   if (!el) return;
   const u = UNITS[state.vehicle] || {};
-  const est = u.priced ? '$' + estimatePrice(state.nights).toLocaleString() : 'Contact for pricing';
+  const bd = u.priced ? priceBreakdown(state.nights) : null;
+  const est = bd ? money(bd.total) : 'Contact for pricing';
   const cell = (label, value) => `
       <div>
         <div style="font-size:0.75rem; color:var(--gray); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;">${label}</div>
@@ -425,6 +478,12 @@ function buildReviewSummary() {
       ${cell('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : ''))}
       ${cell('Estimated Total', '<span style="color:var(--green-dark); font-size:1.1rem;">' + est + '</span>')}
     </div>
+    ${bd ? `<div style="border-top:1px solid var(--cream-dark); margin-bottom:1rem; padding-top:0.85rem; font-size:0.9rem;">
+      <div style="display:flex; justify-content:space-between; padding:0.15rem 0;"><span style="color:var(--gray);">Rental (${state.nights} night${state.nights > 1 ? 's' : ''})</span><span>${money(bd.base)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.15rem 0;"><span style="color:var(--gray);">Cleaning &amp; prep fee</span><span>${money(bd.cleaning)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.15rem 0;"><span style="color:var(--gray);">Wisconsin sales tax (5.5%)</span><span>${money(bd.tax)}</span></div>
+      <div style="display:flex; justify-content:space-between; padding:0.4rem 0 0; font-weight:800; color:var(--green-dark);"><span>Estimated total</span><span>${money(bd.total)}</span></div>
+    </div>` : ''}
     <div style="border-top:1px solid var(--cream-dark); padding-top:1rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.875rem;">
       <div><span style="color:var(--gray);">Email:</span> ${state.email}</div>
       <div><span style="color:var(--gray);">Phone:</span> ${state.phone}</div>
@@ -434,8 +493,8 @@ function buildReviewSummary() {
     </div>`;
 }
 
-// ---- Submit Booking ----
-function submitBooking() {
+// ---- Step 4 → validate agreement checkboxes, then move to e-signature ----
+function proceedToSign() {
   const agree = document.getElementById('agreeTerms');
   const ageCheck = document.getElementById('agreeAge');
   const depCheck = document.getElementById('agreeDeposit');
@@ -445,7 +504,60 @@ function submitBooking() {
     return;
   }
   if (termsErr) termsErr.style.display = 'none';
+  goToStep(5);
+  initSignature();
+}
 
+// ---- Rental agreement e-signature (SignWell, embedded) ----
+// Asks the Netlify function for an embedded signing session for this renter.
+// If SignWell isn't configured yet, we fall back to "we'll email it to you".
+let signatureRequested = false;
+async function initSignature() {
+  if (signatureRequested) return;
+  signatureRequested = true;
+  const loading = document.getElementById('sign-loading');
+  const wrap = document.getElementById('sign-embed-wrap');
+  const frame = document.getElementById('sign-embed');
+  const fallback = document.getElementById('sign-fallback');
+  if (loading) loading.style.display = 'block';
+  try {
+    const res = await fetch('/api/create-signature', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: (state.firstName + ' ' + state.lastName).trim(),
+        email: state.email,
+        camper: (UNITS[state.vehicle] || {}).name || state.vehicle,
+        pickup_date: state.pickupDate ? state.pickupDate.toISOString().split('T')[0] : '',
+        return_date: state.returnDate ? state.returnDate.toISOString().split('T')[0] : ''
+      })
+    });
+    const data = res.ok ? await res.json() : {};
+    if (data && data.embedded_url) {
+      if (frame) frame.src = data.embedded_url;
+      if (wrap) wrap.style.display = 'block';
+      if (loading) loading.style.display = 'none';
+      return;
+    }
+  } catch (e) { /* not configured / offline — show the email fallback below */ }
+  if (loading) loading.style.display = 'none';
+  if (fallback) fallback.style.display = 'block';
+}
+
+// SignWell posts a message to the page when the signer finishes.
+window.addEventListener('message', (e) => {
+  let s = '';
+  try { s = (typeof e.data === 'string' ? e.data : JSON.stringify(e.data || '')).toLowerCase(); } catch (_) { s = ''; }
+  if (!s) return;
+  if (s.includes('signwell') && (s.includes('complete') || s.includes('signed') || s.includes('finish'))) {
+    state.signed = true;
+    const done = document.getElementById('sign-done');
+    if (done) done.style.display = 'block';
+  }
+});
+
+// ---- Submit Booking ----
+function submitBooking() {
   const id = 'CWR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
   const startStr = state.pickupDate.toISOString().split('T')[0];
   const endStr = state.returnDate.toISOString().split('T')[0];
@@ -474,7 +586,7 @@ function submitBooking() {
     pickup_date: startStr,
     return_date: endStr,
     nights: String(state.nights),
-    estimated_total: u.priced ? '$' + estimatePrice(state.nights) : 'Contact for pricing',
+    estimated_total: u.priced ? money(priceBreakdown(state.nights).total) : 'Contact for pricing',
     first_name: state.firstName,
     last_name: state.lastName,
     email: state.email,
@@ -485,10 +597,28 @@ function submitBooking() {
     license_state: state.licenseState,
     group_size: state.groupSize,
     destination: state.destination,
-    special_requests: state.specialRequests
+    special_requests: state.specialRequests,
+    agreement_signed: state.signed ? 'yes' : 'emailed after booking'
   });
   fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
     .catch(() => { /* offline / local preview — request is still saved locally */ });
+
+  // Also store the request in the live system so it appears in Heidi & Will's
+  // dashboard and can be confirmed with one click. Best-effort; never blocks.
+  fetch('/api/request-booking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id, unit: state.vehicle, start: startStr, end: endStr,
+      name: state.firstName + ' ' + state.lastName,
+      email: state.email, phone: state.phone, address: state.address,
+      dob: state.dob, license_number: state.licenseNum, license_state: state.licenseState,
+      group_size: state.groupSize, nights: state.nights,
+      estimated_total: u.priced ? priceBreakdown(state.nights).total : null,
+      destination: state.destination, special_requests: state.specialRequests,
+      signed: state.signed, submittedAt: new Date().toISOString()
+    })
+  }).catch(() => { /* not deployed yet — request still delivered via Netlify Forms */ });
 
   document.getElementById('confirmationId').textContent = id;
   const emailEl = document.getElementById('confirmEmail');
@@ -507,10 +637,13 @@ function submitBooking() {
       card('Pickup Date', formatDate(state.pickupDate)) +
       card('Return Date', formatDate(state.returnDate)) +
       card('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : '')) +
+      card('Rental Agreement', state.signed
+        ? '<span style="color:var(--green-dark);">✓ Signed</span>'
+        : '<span style="color:var(--gertrude);">Sent to your email</span>') +
       card('Booking Status', '<span style="color:var(--gertrude);">⏳ Pending Confirmation</span>');
   }
 
-  goToStep(5);
+  goToStep(6);
 
   if (fullCalendar) {
     fullCalendar.removeAllEvents();
@@ -524,4 +657,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initDatePickers();
   renderSteps();
   updateSummary();
+  loadLiveAvailability();
 });

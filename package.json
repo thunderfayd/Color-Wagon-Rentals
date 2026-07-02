@@ -1,0 +1,9 @@
+{
+  "name": "color-wagon-rentals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Color Wagon Rentals marketing site + live booking backend (Netlify Functions & Blobs).",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

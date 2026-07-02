@@ -348,12 +348,21 @@ h4 { font-size: 1.1rem; }
   transform: rotate(-2deg);
   margin-bottom: 0.2rem;
 }
+.hero-tagline {
+  font-family: var(--font-script);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin: -0.3rem 0 1rem;
+  line-height: 1.1;
+}
 .hero p {
   font-size: 1.18rem;
   color: rgba(255, 249, 239, 0.92);
   margin-bottom: 2rem;
   max-width: 540px;
 }
+.hero p.hero-tagline { margin: -0.3rem 0 1rem; max-width: none; }
 .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
 .hero-scroll {
   position: absolute;

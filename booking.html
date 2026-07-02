@@ -109,7 +109,6 @@
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="fleet.html">Meet the Vans</a></li>
-        <li><a href="tour.html">Virtual Tour</a></li>
         <li><a href="booking.html" class="active">Book Now</a></li>
         <li><a href="index.html#contact">Contact</a></li>
       </ul>
@@ -122,7 +121,6 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
     <a href="fleet.html">Meet the Vans</a>
-    <a href="tour.html">Virtual Tour</a>
     <a href="booking.html">Book Now</a>
     <a href="index.html#contact">Contact</a>
   </div>
@@ -146,6 +144,7 @@
     <input name="group_size" />
     <input name="destination" />
     <input name="special_requests" />
+    <input name="agreement_signed" />
     <input name="bot-field" />
   </form>
 
@@ -217,13 +216,16 @@
               <div class="step-dot" id="dot4"><span class="num">4</span></div>
               <div class="step-line" id="line45"></div>
               <div class="step-dot" id="dot5"><span class="num">5</span></div>
+              <div class="step-line" id="line56"></div>
+              <div class="step-dot" id="dot6"><span class="num">6</span></div>
             </div>
             <div class="step-label-row">
               <span class="step-label active" id="lbl1">Choose Camper</span>
               <span class="step-label" id="lbl2">Dates</span>
               <span class="step-label" id="lbl3">Your Info</span>
               <span class="step-label" id="lbl4">Review</span>
-              <span class="step-label" id="lbl5">Confirmed!</span>
+              <span class="step-label" id="lbl5">Sign</span>
+              <span class="step-label" id="lbl6">Confirmed!</span>
             </div>
           </div>
 
@@ -279,11 +281,11 @@
                   <div class="vehicle-option-img-placeholder" style="background:linear-gradient(135deg,#92400E,#D97706);">&#127957;&#65039;</div>
                   <div class="vehicle-option-info">
                     <div class="vehicle-option-name">The Trailer</div>
-                    <div class="vehicle-option-desc">Sleeps 6 — delivered and set up at your campsite within 30 miles of Crivitz, WI</div>
+                    <div class="vehicle-option-desc">Sleeps 6, full bathroom — delivered and set up within 15 miles of Manitowoc or Crivitz, WI</div>
                     <div class="vehicle-option-specs">
                       <span class="vehicle-spec-badge">&#128106; Sleeps 6</span>
                       <span class="vehicle-spec-badge">&#128230; Delivery incl.</span>
-                      <span class="vehicle-spec-badge">&#128205; Crivitz area</span>
+                      <span class="vehicle-spec-badge">&#128205; Manitowoc/Crivitz</span>
                     </div>
                   </div>
                   <div class="vehicle-option-price">
@@ -293,7 +295,7 @@
               </div>
               <div id="v-error" class="error-msg" style="display:none;">Please select a camper to continue.</div>
               <div class="panel-footer">
-                <span style="color:var(--gray); font-size:0.875rem; font-weight:700;">Step 1 of 4</span>
+                <span style="color:var(--gray); font-size:0.875rem; font-weight:700;">Step 1 of 6</span>
                 <button class="btn btn-primary" onclick="goToStep(2)">Next: Choose Dates &rarr;</button>
               </div>
             </div>
@@ -304,7 +306,7 @@
             <div class="booking-card">
               <h3>Select Your Dates</h3>
               <p style="color:var(--gray); margin-bottom:1rem;">Choose your pickup and return dates.</p>
-              <div class="alert alert-info">&#128197;&nbsp; <strong>$99 per night or $650 per week.</strong> Weekly rentals include 700 miles ($0.45/mile after). Your balance is due 7 days before your journey begins.</div>
+              <div class="alert alert-info">&#128197;&nbsp; <strong>$99 per night or $650 per week.</strong> Includes 100 miles/day ($0.45/mile after). A $50 cleaning &amp; prep fee and Wisconsin sales tax are added to your total. Your balance is due 7 days before your journey begins.</div>
 
               <div class="date-range-inputs">
                 <div class="form-group" style="margin-bottom:0;">
@@ -441,8 +443,8 @@
               <div class="terms-box">
                 <strong>Color Wagon Rentals — Rental Agreement Summary</strong><br/><br/>
                 <strong>1. Driver Requirements:</strong> Renter must be at least 25 years of age and hold a valid driver's license. Renter certifies that they have provided accurate license information.<br/><br/>
-                <strong>2. Deposit &amp; Payment:</strong> A deposit is required to confirm your reservation. Our team will contact you within 24 hours to arrange the deposit payment. The remaining balance is due 7 days before the beginning of your journey. The security deposit is refundable upon return of the vehicle in its original condition.<br/><br/>
-                <strong>3. Mileage:</strong> Each weekly rental includes 700 miles. Additional miles are charged at $0.45 per mile.<br/><br/>
+                <strong>2. Deposit, Fees &amp; Payment:</strong> A deposit is required to confirm your reservation. Our team will contact you within 24 hours to arrange the deposit payment. A $50 cleaning &amp; prep fee and applicable Wisconsin sales tax are added to every rental. The remaining balance is due 7 days before the beginning of your journey. The security deposit is refundable upon return of the vehicle in its original condition.<br/><br/>
+                <strong>3. Mileage:</strong> Each rental includes 100 miles per day. Additional miles are charged at $0.45 per mile.<br/><br/>
                 <strong>4. Fuel:</strong> Vehicle must be returned with the same fuel level as at the time of pickup. A refueling fee will apply if returned low.<br/><br/>
                 <strong>5. Smoking:</strong> Smoking inside the vehicle is strictly prohibited. A cleaning fee will be assessed for violations.<br/><br/>
                 <strong>6. Pets:</strong> Pets are not permitted inside the vehicle unless specifically approved in writing by Color Wagon Rentals prior to the rental period.<br/><br/>
@@ -473,13 +475,42 @@
 
               <div class="panel-footer">
                 <button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
-                <button class="btn btn-coral btn-lg" onclick="submitBooking()">&#128203; Submit Booking Request</button>
+                <button class="btn btn-coral btn-lg" onclick="proceedToSign()">&#9997;&#65039; Review &amp; Sign Agreement &rarr;</button>
               </div>
             </div>
           </div>
 
-          <!-- STEP 5: Confirmation -->
+          <!-- STEP 5: Sign Rental Agreement -->
           <div class="booking-panel" id="step5">
+            <div class="booking-card">
+              <h3>Sign Your Rental Agreement</h3>
+              <p style="color:var(--gray); margin-bottom:1rem;">Review and electronically sign the Color Wagon Rentals rental agreement below. The agreement runs several pages — follow the guided prompts to sign each spot, then submit your request.</p>
+
+              <div id="sign-loading" class="alert alert-info" style="display:none;">&#8987;&nbsp; Preparing your rental agreement&hellip;</div>
+
+              <!-- Embedded SignWell agreement (shown when e-signature is configured) -->
+              <div id="sign-embed-wrap" style="display:none; border:1px solid var(--cream-dark); border-radius:var(--radius); overflow:hidden; height:70vh; min-height:520px;">
+                <iframe id="sign-embed" title="Rental agreement e-signature" style="width:100%; height:100%; border:0;" allow="camera; microphone; clipboard-write"></iframe>
+              </div>
+
+              <div id="sign-done" class="alert alert-success" style="display:none;">&#10003;&nbsp; <strong>Agreement signed.</strong> Thanks! Submit your request below to finish.</div>
+
+              <!-- Fallback shown when e-signature isn't set up yet (or can't load) -->
+              <div id="sign-fallback" style="display:none;">
+                <div class="alert alert-warning">
+                  &#9997;&#65039; <strong>We'll email your rental agreement to sign.</strong> After you submit, Heidi &amp; Will will send the full rental agreement to your email for electronic signature before pickup — nothing to print.
+                </div>
+              </div>
+
+              <div class="panel-footer">
+                <button class="btn btn-secondary" onclick="goToStep(4)">&larr; Back</button>
+                <button class="btn btn-coral btn-lg" id="finishBtn" onclick="submitBooking()">&#128203; Submit Booking Request</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: Confirmation -->
+          <div class="booking-panel" id="step6">
             <div class="booking-card">
               <div class="confirmation-banner">
                 <div class="confirmation-check">&#10003;</div>
@@ -508,7 +539,7 @@
               </div>
               <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;">
                 <a href="index.html" class="btn btn-secondary">Back to Home</a>
-                <a href="tour.html" class="btn btn-primary">Take the Virtual Tour</a>
+                <a href="fleet.html" class="btn btn-primary">Meet the Vans</a>
               </div>
             </div>
           </div>

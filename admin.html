@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Booking Dashboard — Color Wagon Rentals</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--cream); }
+    .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .admin-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .admin-head h1 { font-size: 1.6rem; }
+    .admin-card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .admin-card h2 { font-size: 1.15rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .pill { font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 999px; background: var(--cream-dark); color: var(--ink); }
+    .row-item { border: 1px solid var(--cream-dark); border-radius: var(--radius); padding: 0.9rem 1rem; margin-bottom: 0.75rem; }
+    .row-item .top { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; align-items: baseline; }
+    .row-item .who { font-weight: 800; }
+    .row-item .meta { color: var(--gray); font-size: 0.85rem; margin-top: 0.25rem; line-height: 1.5; }
+    .unit-chip { font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.55rem; border-radius: 999px; color: #fff; text-transform: capitalize; }
+    .unit-gertrude { background: var(--gertrude); }
+    .unit-violet { background: var(--violet); }
+    .unit-trailer { background: var(--trailer); }
+    .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .empty { color: var(--gray); font-style: italic; padding: 0.5rem 0; }
+    .login-box { max-width: 420px; margin: 4rem auto; }
+    .add-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+    @media (max-width: 640px) { .add-grid { grid-template-columns: 1fr 1fr; } }
+    .muted { color: var(--gray); font-size: 0.85rem; }
+    #banner { display:none; padding:0.75rem 1rem; border-radius: var(--radius); margin-bottom:1rem; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="admin-wrap">
+
+    <!-- Login -->
+    <div id="loginView" class="admin-card login-box">
+      <h2>&#128274; Dashboard Login</h2>
+      <p class="muted" style="margin-bottom:1rem;">Enter the dashboard password to manage bookings.</p>
+      <div class="form-group">
+        <label for="pw">Password</label>
+        <input type="password" id="pw" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <div id="loginError" class="muted" style="color:var(--stripe-red); display:none; margin-bottom:0.75rem;">Incorrect password — try again.</div>
+      <button class="btn btn-primary" style="width:100%;" onclick="login()">Log In</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashView" style="display:none;">
+      <div class="admin-head">
+        <div>
+          <h1>Booking Dashboard</h1>
+          <div class="muted">Color Wagon Rentals · changes go live on the site instantly</div>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="refresh()">&#8635; Refresh</button>
+          <button class="btn btn-secondary btn-sm" onclick="logout()">Log out</button>
+        </div>
+      </div>
+
+      <div id="banner"></div>
+
+      <!-- Pending requests -->
+      <div class="admin-card">
+        <h2>&#128236; New Requests <span class="pill" id="reqCount">0</span></h2>
+        <div id="requests"><div class="empty">Loading…</div></div>
+      </div>
+
+      <!-- Confirmed / blocked dates -->
+      <div class="admin-card">
+        <h2>&#128197; Booked &amp; Blocked Dates <span class="pill" id="confCount">0</span></h2>
+        <div id="confirmed"><div class="empty">Loading…</div></div>
+      </div>
+
+      <!-- Manually add a booking / block -->
+      <div class="admin-card">
+        <h2>&#10133; Add a Booking or Block Dates</h2>
+        <div class="add-grid">
+          <div class="form-group" style="margin:0;">
+            <label for="addUnit">Camper</label>
+            <select id="addUnit">
+              <option value="gertrude">Gertrude</option>
+              <option value="violet">Violet</option>
+              <option value="trailer">The Trailer</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="addStart">Pickup / start</label>
+            <input type="date" id="addStart" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="addEnd">Return / end</label>
+            <input type="date" id="addEnd" />
+          </div>
+          <button class="btn btn-primary" onclick="addBooking()">Add</button>
+        </div>
+        <p class="muted" style="margin-top:0.75rem;">Use this to block dates for maintenance or bookings taken by phone.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let password = sessionStorage.getItem('cwrAdminPw') || '';
+
+    async function api(action, extra) {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ password, action }, extra || {}))
+      });
+      return { status: res.status, data: await res.json().catch(() => ({})) };
+    }
+
+    function banner(msg, ok) {
+      const b = $('banner');
+      b.textContent = msg;
+      b.style.display = 'block';
+      b.style.background = ok ? '#DCFCE7' : '#FEE2E2';
+      b.style.color = ok ? '#15803D' : '#B91C1C';
+      setTimeout(() => { b.style.display = 'none'; }, 3500);
+    }
+
+    async function login() {
+      password = $('pw').value;
+      const { status } = await api('list');
+      if (status === 200) {
+        sessionStorage.setItem('cwrAdminPw', password);
+        $('loginView').style.display = 'none';
+        $('dashView').style.display = 'block';
+        refresh();
+      } else {
+        $('loginError').style.display = 'block';
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('cwrAdminPw');
+      location.reload();
+    }
+
+    function unitChip(u) {
+      const names = { gertrude: 'Gertrude', violet: 'Violet', trailer: 'Trailer' };
+      return `<span class="unit-chip unit-${u}">${names[u] || u}</span>`;
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+    async function refresh() {
+      const { status, data } = await api('list');
+      if (status !== 200) { banner('Session expired — log in again.', false); logout(); return; }
+      renderRequests(data.requests || []);
+      renderConfirmed(data.confirmed || []);
+    }
+
+    function renderRequests(reqs) {
+      $('reqCount').textContent = reqs.length;
+      if (!reqs.length) { $('requests').innerHTML = '<div class="empty">No new requests right now.</div>'; return; }
+      $('requests').innerHTML = reqs.map((r) => `
+        <div class="row-item">
+          <div class="top">
+            <div><span class="who">${esc(r.name)}</span> &nbsp;${unitChip(r.unit)}</div>
+            <div class="muted">${esc(r.start)} → ${esc(r.end)}${r.nights ? ' · ' + esc(r.nights) + ' nights' : ''}</div>
+          </div>
+          <div class="meta">
+            ${esc(r.email)} · ${esc(r.phone)}${r.estimated_total ? ' · est. $' + esc(r.estimated_total) : ''}<br/>
+            ${r.group_size ? 'Group of ' + esc(r.group_size) + ' · ' : ''}${r.license_state ? 'License ' + esc(r.license_state) + ' ' + esc(r.license_number) + ' · ' : ''}Agreement: ${r.signed ? 'signed ✓' : 'not yet'}
+            ${r.destination ? '<br/>Trip: ' + esc(r.destination) : ''}${r.special_requests ? '<br/>Notes: ' + esc(r.special_requests) : ''}
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary btn-sm" onclick="confirmReq('${esc(r.id)}')">&#10003; Confirm &amp; block dates</button>
+            <button class="btn btn-secondary btn-sm" onclick="declineReq('${esc(r.id)}')">Decline</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function renderConfirmed(list) {
+      $('confCount').textContent = list.length;
+      if (!list.length) { $('confirmed').innerHTML = '<div class="empty">No booked dates yet.</div>'; return; }
+      $('confirmed').innerHTML = list.map((b) => `
+        <div class="row-item">
+          <div class="top">
+            <div>${unitChip(b.unit)} &nbsp;<span class="who">${esc(b.name || 'Booked')}</span></div>
+            <div class="muted">${esc(b.start)} → ${esc(b.end)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="delBooking('${esc(b.id)}')">Remove</button>
+          </div>
+        </div>`).join('');
+    }
+
+    async function confirmReq(id) { const { data } = await api('confirm', { id }); banner('Booking confirmed — calendar updated.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
+    async function declineReq(id) { const { data } = await api('decline', { id }); banner('Request declined.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
+    async function delBooking(id) { const { data } = await api('delete', { id }); banner('Dates freed up.', true); renderConfirmed(data.confirmed||[]); renderRequests(data.requests||[]); }
+
+    async function addBooking() {
+      const unit = $('addUnit').value, start = $('addStart').value, end = $('addEnd').value;
+      if (!start || !end || end <= start) { banner('Pick a valid start and end date.', false); return; }
+      const { data } = await api('add', { unit, start, end });
+      $('addStart').value = ''; $('addEnd').value = '';
+      banner('Dates blocked.', true);
+      renderConfirmed(data.confirmed || []);
+    }
+
+    $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+
+    // Auto-login if a password is remembered this session.
+    if (password) {
+      api('list').then(({ status, data }) => {
+        if (status === 200) {
+          $('loginView').style.display = 'none';
+          $('dashView').style.display = 'block';
+          renderRequests(data.requests || []);
+          renderConfirmed(data.confirmed || []);
+        }
+      });
+    }
+    // Keep the dashboard fresh.
+    setInterval(() => { if ($('dashView').style.display === 'block') refresh(); }, 30000);
+  </script>
+</body>
+</html>
