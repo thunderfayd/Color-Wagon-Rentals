@@ -1,6 +1,6 @@
 // Stores an incoming booking request so it shows up in the admin dashboard.
 // Delivery/email still happens via Netlify Forms; this is the "live" copy.
-const { getStore } = require('@netlify/blobs');
+const { getStore, connectLambda } = require('@netlify/blobs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'method_not_allowed' });
@@ -9,6 +9,7 @@ exports.handler = async (event) => {
   if (!data.unit || !data.start || !data.end) return json(400, { error: 'missing_fields' });
 
   try {
+    connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
     const store = getStore({ name: 'colorwagon', consistency: 'strong' });
     const requests = (await store.get('requests', { type: 'json' })) || [];
     data.receivedAt = new Date().toISOString();

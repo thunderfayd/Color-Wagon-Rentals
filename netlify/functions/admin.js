@@ -1,6 +1,6 @@
 // Password-protected admin API for Heidi & Will's dashboard.
 // Requires the ADMIN_PASSWORD environment variable set in Netlify.
-const { getStore } = require('@netlify/blobs');
+const { getStore, connectLambda } = require('@netlify/blobs');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'method_not_allowed' });
@@ -12,6 +12,7 @@ exports.handler = async (event) => {
   if (!pass) return json(500, { error: 'not_configured', message: 'Set ADMIN_PASSWORD in Netlify site settings.' });
   if (!body.password || body.password !== pass) return json(401, { error: 'unauthorized' });
 
+  connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
   const store = getStore({ name: 'colorwagon', consistency: 'strong' });
 
   // Load + normalise (every confirmed booking must have a stable id).

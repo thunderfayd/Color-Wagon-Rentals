@@ -1,6 +1,6 @@
 // Public availability feed — powers the live booking calendar.
 // Returns only { unit, start, end } (no customer info).
-const { getStore } = require('@netlify/blobs');
+const { getStore, connectLambda } = require('@netlify/blobs');
 
 // One-time seed: the dates that were in js/bookings-data.js at launch.
 // After the first request these live in the Blobs store and are managed
@@ -15,8 +15,9 @@ const SEED = [
   { unit: 'gertrude', start: '2026-08-14', end: '2026-08-21' }
 ];
 
-exports.handler = async () => {
+exports.handler = async (event) => {
   try {
+    connectLambda(event); // wire up Blobs credentials for classic (Lambda) functions
     const store = getStore({ name: 'colorwagon', consistency: 'strong' });
     let confirmed = await store.get('confirmed', { type: 'json' });
     if (!Array.isArray(confirmed)) {
