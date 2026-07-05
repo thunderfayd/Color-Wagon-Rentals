@@ -13,7 +13,7 @@
   <style>
     body { background: var(--cream); }
     .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-    .admin-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .admin-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; }
     .admin-head h1 { font-size: 1.6rem; }
     .admin-card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 1.5rem; margin-bottom: 1.5rem; }
     .admin-card h2 { font-size: 1.15rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -33,6 +33,35 @@
     @media (max-width: 640px) { .add-grid { grid-template-columns: 1fr 1fr; } }
     .muted { color: var(--gray); font-size: 0.85rem; }
     #banner { display:none; padding:0.75rem 1rem; border-radius: var(--radius); margin-bottom:1rem; font-weight:700; }
+    /* Tabs */
+    .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab-btn { padding: 0.5rem 1.1rem; border-radius: 999px; border: 2px solid var(--cream-dark); background: var(--white); font-weight: 800; font-size: 0.85rem; color: var(--ink); cursor: pointer; }
+    .tab-btn.active { border-color: var(--green); background: rgba(30,122,70,0.08); color: var(--green-dark); }
+    /* Stat tiles */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 760px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-tile { background: var(--cream); border-radius: var(--radius); padding: 1rem 1.1rem; }
+    .stat-tile .n { font-family: var(--font-display); font-size: 1.7rem; font-weight: 800; color: var(--green-dark); line-height: 1.1; }
+    .stat-tile .l { font-size: 0.78rem; color: var(--gray); font-weight: 700; margin-top: 0.25rem; }
+    /* Bars */
+    .bar-row { display: grid; grid-template-columns: 90px 1fr 120px; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
+    .bar-track { background: var(--cream-dark); border-radius: 999px; height: 14px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    .bar-val { text-align: right; color: var(--gray); font-weight: 700; }
+    /* Checklist */
+    .chk { border: 1px solid var(--cream-dark); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 0.85rem; }
+    .chk .chk-top { display: flex; align-items: center; gap: 0.6rem; justify-content: space-between; }
+    .chk .chk-title { font-weight: 800; display: flex; align-items: center; gap: 0.55rem; }
+    .chk-badge { font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px; white-space: nowrap; }
+    .chk-done { background: #DCFCE7; color: #15803D; }
+    .chk-todo { background: #FEF3C7; color: #92400E; }
+    .chk-action { background: #EFF6FF; color: #1E40AF; }
+    .chk-body { color: var(--ink); font-size: 0.9rem; line-height: 1.6; margin-top: 0.7rem; }
+    .chk-body ol { margin: 0.3rem 0 0 1.1rem; }
+    .chk-body li { margin-bottom: 0.3rem; }
+    .chk-body code { background: var(--cream); padding: 0.05rem 0.35rem; border-radius: 5px; font-size: 0.85em; }
+    .view { display: none; }
+    .view.active { display: block; }
   </style>
 </head>
 <body>
@@ -63,50 +92,84 @@
         </div>
       </div>
 
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-bookings" onclick="showView('bookings')">&#128197; Bookings</button>
+        <button class="tab-btn" id="tab-analytics" onclick="showView('analytics')">&#128202; Analytics</button>
+        <button class="tab-btn" id="tab-checklist" onclick="showView('checklist')">&#9989; Launch Checklist <span class="pill" id="chkPill" style="display:none;">0</span></button>
+      </div>
+
       <div id="banner"></div>
 
-      <!-- Pending requests -->
-      <div class="admin-card">
-        <h2>&#128236; New Requests <span class="pill" id="reqCount">0</span></h2>
-        <div id="requests"><div class="empty">Loading…</div></div>
-      </div>
-
-      <!-- Confirmed / blocked dates -->
-      <div class="admin-card">
-        <h2>&#128197; Booked &amp; Blocked Dates <span class="pill" id="confCount">0</span></h2>
-        <div id="confirmed"><div class="empty">Loading…</div></div>
-      </div>
-
-      <!-- Manually add a booking / block -->
-      <div class="admin-card">
-        <h2>&#10133; Add a Booking or Block Dates</h2>
-        <div class="add-grid">
-          <div class="form-group" style="margin:0;">
-            <label for="addUnit">Camper</label>
-            <select id="addUnit">
-              <option value="gertrude">Gertrude</option>
-              <option value="violet">Violet</option>
-              <option value="trailer">The Trailer</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label for="addStart">Pickup / start</label>
-            <input type="date" id="addStart" />
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label for="addEnd">Return / end</label>
-            <input type="date" id="addEnd" />
-          </div>
-          <button class="btn btn-primary" onclick="addBooking()">Add</button>
+      <!-- ===== BOOKINGS VIEW ===== -->
+      <div class="view active" id="view-bookings">
+        <div class="admin-card">
+          <h2>&#128236; New Requests <span class="pill" id="reqCount">0</span></h2>
+          <div id="requests"><div class="empty">Loading…</div></div>
         </div>
-        <p class="muted" style="margin-top:0.75rem;">Use this to block dates for maintenance or bookings taken by phone.</p>
+
+        <div class="admin-card">
+          <h2>&#128197; Booked &amp; Blocked Dates <span class="pill" id="confCount">0</span></h2>
+          <div id="confirmed"><div class="empty">Loading…</div></div>
+        </div>
+
+        <div class="admin-card">
+          <h2>&#10133; Add a Booking or Block Dates</h2>
+          <div class="add-grid">
+            <div class="form-group" style="margin:0;">
+              <label for="addUnit">Camper</label>
+              <select id="addUnit">
+                <option value="gertrude">Gertrude</option>
+                <option value="violet">Violet</option>
+                <option value="trailer">The Trailer</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="addStart">Pickup / start</label>
+              <input type="date" id="addStart" />
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label for="addEnd">Return / end</label>
+              <input type="date" id="addEnd" />
+            </div>
+            <button class="btn btn-primary" onclick="addBooking()">Add</button>
+          </div>
+          <p class="muted" style="margin-top:0.75rem;">Use this to block dates for maintenance or bookings taken by phone.</p>
+        </div>
       </div>
+
+      <!-- ===== ANALYTICS VIEW ===== -->
+      <div class="view" id="view-analytics">
+        <div class="admin-card">
+          <h2>&#128202; At a Glance</h2>
+          <div class="stat-grid" id="statGrid"></div>
+        </div>
+        <div class="admin-card">
+          <h2>&#128663; Bookings by Camper</h2>
+          <div id="unitBars"><div class="empty">No data yet.</div></div>
+        </div>
+        <div class="admin-card">
+          <h2>&#128197; Upcoming Trips <span class="pill" id="upCount">0</span></h2>
+          <div id="upcoming"><div class="empty">No upcoming trips.</div></div>
+        </div>
+        <p class="muted">Revenue figures are estimates from the booking form (before final confirmation, tax rounding, and any extra-mileage charges).</p>
+      </div>
+
+      <!-- ===== CHECKLIST VIEW ===== -->
+      <div class="view" id="view-checklist">
+        <div class="admin-card">
+          <h2>&#9989; Launch Checklist</h2>
+          <p class="muted" style="margin-bottom:1.25rem;">Everything needed to fully switch the site on. Items with a live status update automatically; the rest are things to confirm or set up with your developer.</p>
+          <div id="checklist"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
     let password = sessionStorage.getItem('cwrAdminPw') || '';
+    let CONFIG = {}, LOG = [], CONFIRMED = [], REQUESTS = [];
 
     async function api(action, extra) {
       const res = await fetch('/api/admin', {
@@ -124,6 +187,13 @@
       b.style.background = ok ? '#DCFCE7' : '#FEE2E2';
       b.style.color = ok ? '#15803D' : '#B91C1C';
       setTimeout(() => { b.style.display = 'none'; }, 3500);
+    }
+
+    function showView(name) {
+      ['bookings', 'analytics', 'checklist'].forEach((v) => {
+        $('view-' + v).classList.toggle('active', v === name);
+        $('tab-' + v).classList.toggle('active', v === name);
+      });
     }
 
     async function login() {
@@ -149,12 +219,20 @@
       return `<span class="unit-chip unit-${u}">${names[u] || u}</span>`;
     }
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+    function money(n) { return '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+    function daysBetween(a, b) { return Math.max(0, Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000)); }
 
     async function refresh() {
       const { status, data } = await api('list');
       if (status !== 200) { banner('Session expired, log in again.', false); logout(); return; }
-      renderRequests(data.requests || []);
-      renderConfirmed(data.confirmed || []);
+      CONFIRMED = data.confirmed || [];
+      REQUESTS = data.requests || [];
+      LOG = data.log || [];
+      CONFIG = data.config || {};
+      renderRequests(REQUESTS);
+      renderConfirmed(CONFIRMED);
+      renderAnalytics();
+      renderChecklist();
     }
 
     function renderRequests(reqs) {
@@ -167,7 +245,7 @@
             <div class="muted">${esc(r.start)} → ${esc(r.end)}${r.nights ? ' · ' + esc(r.nights) + ' nights' : ''}</div>
           </div>
           <div class="meta">
-            ${esc(r.email)} · ${esc(r.phone)}${r.estimated_total ? ' · est. $' + esc(r.estimated_total) : ''}<br/>
+            ${esc(r.email)} · ${esc(r.phone)}${r.estimated_total ? ' · est. ' + money(r.estimated_total) : ''}<br/>
             ${r.group_size ? 'Group of ' + esc(r.group_size) + ' · ' : ''}${r.license_state ? 'License ' + esc(r.license_state) + ' ' + esc(r.license_number) + ' · ' : ''}Agreement: ${r.signed ? 'signed ✓' : 'not yet'}
             ${r.destination ? '<br/>Trip: ' + esc(r.destination) : ''}${r.special_requests ? '<br/>Notes: ' + esc(r.special_requests) : ''}
           </div>
@@ -193,9 +271,122 @@
         </div>`).join('');
     }
 
-    async function confirmReq(id) { const { data } = await api('confirm', { id }); banner('Booking confirmed, calendar updated.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
-    async function declineReq(id) { const { data } = await api('decline', { id }); banner('Request declined.', true); renderRequests(data.requests||[]); renderConfirmed(data.confirmed||[]); }
-    async function delBooking(id) { const { data } = await api('delete', { id }); banner('Dates freed up.', true); renderConfirmed(data.confirmed||[]); renderRequests(data.requests||[]); }
+    // ---------- Analytics ----------
+    function renderAnalytics() {
+      const total = LOG.length;
+      const confirmedLog = LOG.filter((x) => x.status === 'confirmed');
+      const pending = LOG.filter((x) => x.status === 'pending').length;
+      const declined = LOG.filter((x) => x.status === 'declined').length;
+      const conf = confirmedLog.length;
+      const conv = total ? Math.round((conf / total) * 100) : 0;
+      const revenue = confirmedLog.reduce((s, x) => s + (Number(x.estimated_total) || 0), 0);
+      const pipeline = LOG.filter((x) => x.status === 'pending').reduce((s, x) => s + (Number(x.estimated_total) || 0), 0);
+      const signedRate = total ? Math.round((LOG.filter((x) => x.signed).length / total) * 100) : 0;
+      const nights = CONFIRMED.reduce((s, b) => s + daysBetween(b.start, b.end), 0);
+
+      $('statGrid').innerHTML = [
+        ['Total requests', total],
+        ['Confirmed', conf],
+        ['Pending', pending],
+        ['Conversion', conv + '%'],
+        ['Revenue booked', money(revenue)],
+        ['Pipeline (pending)', money(pipeline)],
+        ['Nights booked', nights],
+        ['Agreements signed', signedRate + '%']
+      ].map(([l, n]) => `<div class="stat-tile"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+      // Per-unit bars (confirmed bookings + revenue)
+      const units = ['gertrude', 'violet', 'trailer'];
+      const colors = { gertrude: 'var(--gertrude)', violet: 'var(--violet)', trailer: 'var(--trailer)' };
+      const names = { gertrude: 'Gertrude', violet: 'Violet', trailer: 'Trailer' };
+      const counts = {}; const rev = {};
+      units.forEach((u) => { counts[u] = 0; rev[u] = 0; });
+      confirmedLog.forEach((x) => { if (counts[x.unit] != null) { counts[x.unit]++; rev[x.unit] += Number(x.estimated_total) || 0; } });
+      // include manual/confirmed bookings that predate the log
+      const maxCount = Math.max(1, ...units.map((u) => counts[u]));
+      if (!conf && !CONFIRMED.length) {
+        $('unitBars').innerHTML = '<div class="empty">No bookings yet.</div>';
+      } else {
+        $('unitBars').innerHTML = units.map((u) => `
+          <div class="bar-row">
+            <div>${names[u]}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(counts[u] / maxCount) * 100}%; background:${colors[u]};"></div></div>
+            <div class="bar-val">${counts[u]} · ${money(rev[u])}</div>
+          </div>`).join('');
+      }
+
+      // Upcoming trips
+      const today = new Date().toISOString().split('T')[0];
+      const up = CONFIRMED.filter((b) => b.end >= today).sort((a, b) => (a.start < b.start ? -1 : 1)).slice(0, 8);
+      $('upCount').textContent = up.length;
+      $('upcoming').innerHTML = up.length ? up.map((b) => `
+        <div class="row-item">
+          <div class="top">
+            <div>${unitChip(b.unit)} &nbsp;<span class="who">${esc(b.name || 'Booked')}</span></div>
+            <div class="muted">${esc(b.start)} → ${esc(b.end)} · ${daysBetween(b.start, b.end)} nights</div>
+          </div>
+        </div>`).join('') : '<div class="empty">No upcoming trips.</div>';
+    }
+
+    // ---------- Launch checklist ----------
+    function renderChecklist() {
+      const onDomain = /colorwagonrentals\.com$/.test(location.hostname);
+      const steps = [
+        { title: 'Website built &amp; deployed', status: 'done',
+          body: 'Your site is live and redeploys automatically whenever a change is pushed. Nothing to do here.' },
+        { title: 'Custom domain (colorwagonrentals.com)', status: onDomain ? 'done' : 'action',
+          body: onDomain
+            ? 'You are viewing this dashboard on your real domain, so DNS is working.'
+            : 'DNS is pointed at Netlify. Once the SSL certificate finishes, open the site + this dashboard at <code>https://www.colorwagonrentals.com/admin.html</code>.' },
+        { title: 'Dashboard password', status: 'done',
+          body: 'You are logged in, so <code>ADMIN_PASSWORD</code> is set. To change it, update the variable in Netlify and redeploy.' },
+        { title: 'E-signature &mdash; rental agreement (SignWell)', status: CONFIG.signwell ? 'done' : 'todo',
+          body: CONFIG.signwell
+            ? ('Connected' + (CONFIG.signwell_test ? ' <strong>(TEST MODE)</strong> &mdash; remove <code>SIGNWELL_TEST_MODE</code> to go live.' : '. Renters sign the agreement inside the booking flow.'))
+            : '<ol>' +
+                '<li>Create a <strong>SignWell</strong> account.</li>' +
+                '<li>Build a reusable <strong>Template</strong> of your rental agreement with all <strong>12 signature fields</strong> placed across the pages, assigned to "the renter".</li>' +
+                '<li>Copy your <strong>API Key</strong> (Settings → API) and the <strong>Template ID</strong>.</li>' +
+                '<li>In Netlify → Site configuration → Environment variables, add <code>SIGNWELL_API_KEY</code> and <code>SIGNWELL_TEMPLATE_ID</code> (add <code>SIGNWELL_TEST_MODE=true</code> while testing).</li>' +
+                '<li>Trigger a deploy. The booking flow then embeds the live agreement automatically.</li>' +
+              '</ol>' +
+              'Until then, the booking page tells renters the agreement will be emailed to them &mdash; so bookings still work.' },
+        { title: 'Payment / deposit collection', status: CONFIG.payment ? 'done' : 'todo',
+          body: CONFIG.payment
+            ? ('Connected' + (CONFIG.payment_link ? ' &mdash; deposit link: <code>' + esc(CONFIG.payment_link) + '</code>' : '.'))
+            : '<ol>' +
+                '<li>Recommended: <strong>Stripe</strong>. Create an account and decide your <strong>deposit amount</strong> + refund policy (bring this to the meeting with Heidi).</li>' +
+                '<li>Simplest path: create a Stripe <strong>Payment Link</strong> for the deposit, then add it in Netlify as <code>PAYMENT_LINK_URL</code> so it appears on the booking confirmation.</li>' +
+                '<li>For automatic charge-at-booking (Stripe Checkout), your developer wires it into the booking flow once you decide the amounts.</li>' +
+              '</ol>' +
+              'Right now the site tells renters "we\'ll contact you within 24 hours to arrange the deposit," which is a fine interim step.' },
+        { title: 'Confirm Wisconsin sales-tax rate', status: 'action',
+          body: 'The site currently adds <strong>5.5%</strong> (WI state 5% + Manitowoc County 0.5%) on top of the rental + $50 cleaning fee. Confirm this is correct for your situation; tell your developer if it should change.' },
+        { title: 'Set www as the primary domain (optional)', status: onDomain ? 'done' : 'action',
+          body: 'The site\'s links use the <code>www.</code> version. In Netlify → Domain management, set <code>www.colorwagonrentals.com</code> as the primary domain so everything matches.' }
+      ];
+
+      const badge = { done: ['chk-done', 'Done'], todo: ['chk-todo', 'To do'], action: ['chk-action', 'Confirm'] };
+      const remaining = steps.filter((s) => s.status !== 'done').length;
+      const pill = $('chkPill');
+      if (remaining > 0) { pill.style.display = 'inline-block'; pill.textContent = remaining; } else { pill.style.display = 'none'; }
+
+      $('checklist').innerHTML = steps.map((s) => {
+        const [cls, label] = badge[s.status];
+        const icon = s.status === 'done' ? '✅' : (s.status === 'todo' ? '⬜' : '🔎');
+        return `<div class="chk">
+          <div class="chk-top">
+            <div class="chk-title">${icon} <span>${s.title}</span></div>
+            <span class="chk-badge ${cls}">${label}</span>
+          </div>
+          <div class="chk-body">${s.body}</div>
+        </div>`;
+      }).join('');
+    }
+
+    async function confirmReq(id) { const { data } = await api('confirm', { id }); banner('Booking confirmed, calendar updated.', true); ingest(data); }
+    async function declineReq(id) { const { data } = await api('decline', { id }); banner('Request declined.', true); ingest(data); }
+    async function delBooking(id) { const { data } = await api('delete', { id }); banner('Dates freed up.', true); ingest(data); }
 
     async function addBooking() {
       const unit = $('addUnit').value, start = $('addStart').value, end = $('addEnd').value;
@@ -203,7 +394,19 @@
       const { data } = await api('add', { unit, start, end });
       $('addStart').value = ''; $('addEnd').value = '';
       banner('Dates blocked.', true);
-      renderConfirmed(data.confirmed || []);
+      ingest(data);
+    }
+
+    function ingest(data) {
+      if (!data) return;
+      CONFIRMED = data.confirmed || CONFIRMED;
+      REQUESTS = data.requests || REQUESTS;
+      if (data.log) LOG = data.log;
+      if (data.config) CONFIG = data.config;
+      renderRequests(REQUESTS);
+      renderConfirmed(CONFIRMED);
+      renderAnalytics();
+      renderChecklist();
     }
 
     $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
@@ -214,8 +417,7 @@
         if (status === 200) {
           $('loginView').style.display = 'none';
           $('dashView').style.display = 'block';
-          renderRequests(data.requests || []);
-          renderConfirmed(data.confirmed || []);
+          ingest(data);
         }
       });
     }

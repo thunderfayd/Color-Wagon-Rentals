@@ -94,6 +94,23 @@
     .avail-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
     .avail-item { display: flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; color: var(--gray); font-weight: 700; }
     .avail-dot { width: 12px; height: 12px; border-radius: 4px; }
+    /* Date picker: make open days the focal point */
+    .flatpickr-day.fp-open:not(.flatpickr-disabled):not(.today):not(.selected):not(.startRange):not(.endRange):not(.inRange) {
+      background: rgba(30,122,70,0.10);
+      border-color: rgba(30,122,70,0.28);
+      color: var(--green-dark);
+      font-weight: 800;
+    }
+    .flatpickr-day.fp-open:not(.flatpickr-disabled):hover { background: rgba(30,122,70,0.22); }
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.flatpickr-disabled:hover {
+      text-decoration: line-through;
+      color: #cbb8a6 !important;
+      background: transparent;
+    }
+    .date-legend { display:flex; gap:1.25rem; flex-wrap:wrap; margin-top:0.75rem; font-size:0.8rem; color:var(--gray); font-weight:700; }
+    .date-legend span { display:inline-flex; align-items:center; gap:0.4rem; }
+    .date-legend i { width:14px; height:14px; border-radius:4px; display:inline-block; }
   </style>
 </head>
 <body>
@@ -305,7 +322,11 @@
           <div class="booking-panel" id="step2">
             <div class="booking-card">
               <h3>Select Your Dates</h3>
-              <p style="color:var(--gray); margin-bottom:1rem;">Choose your pickup and return dates.</p>
+              <p style="color:var(--gray); margin-bottom:0.5rem;">Pick your dates below. <strong style="color:var(--green-dark);">Open days are highlighted in green</strong> for the camper you chose; crossed-out days are already booked.</p>
+              <div class="date-legend" style="margin-bottom:1rem;">
+                <span><i style="background:rgba(30,122,70,0.18); border:1.5px solid var(--green);"></i> Available</span>
+                <span><i style="background:transparent; border:1.5px solid var(--cream-dark);"></i> <span style="text-decoration:line-through; color:#cbb8a6;">Booked</span></span>
+              </div>
               <div class="alert alert-info">&#128197;&nbsp; <strong>$99 per night or $650 per week.</strong> Includes 100 miles/day ($0.45/mile after). A $50 cleaning &amp; prep fee and Wisconsin sales tax are added to your total. Your balance is due 7 days before your journey begins.</div>
 
               <div class="date-range-inputs">

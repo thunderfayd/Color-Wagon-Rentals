@@ -16,6 +16,24 @@ exports.handler = async (event) => {
     data.status = 'pending';
     requests.push(data);
     await store.setJSON('requests', requests);
+
+    // Append to the permanent analytics log (compact + capped). Requests that
+    // are later declined are removed from the queue but stay here for stats.
+    try {
+      let log = (await store.get('log', { type: 'json' })) || [];
+      log.push({
+        id: data.id,
+        unit: data.unit,
+        nights: data.nights != null ? data.nights : null,
+        estimated_total: data.estimated_total != null ? data.estimated_total : null,
+        signed: !!data.signed,
+        receivedAt: data.receivedAt,
+        status: 'pending'
+      });
+      if (log.length > 2000) log = log.slice(-2000);
+      await store.setJSON('log', log);
+    } catch (e) { /* analytics log is best-effort */ }
+
     return json(200, { ok: true });
   } catch (e) {
     return json(200, { ok: false, error: 'store_unavailable' });

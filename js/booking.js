@@ -76,6 +76,7 @@ async function loadLiveAvailability() {
         fullCalendar.addEventSource(getCalendarEvents(activeFilter));
       }
       checkDateAvailability();
+      applyAvailabilityToPickers();
     }
   } catch (e) { /* offline / not deployed yet - static fallback stays */ }
 }
@@ -179,6 +180,8 @@ function initDatePickers() {
     dateFormat: 'Y-m-d',
     altInput: true,
     altFormat: 'F j, Y',
+    disable: [],
+    onDayCreate: markOpenDay,
     onChange(selectedDates) {
       if (selectedDates.length) {
         state.pickupDate = selectedDates[0];
@@ -200,6 +203,8 @@ function initDatePickers() {
     dateFormat: 'Y-m-d',
     altInput: true,
     altFormat: 'F j, Y',
+    disable: [],
+    onDayCreate: markOpenDay,
     onChange(selectedDates) {
       if (selectedDates.length) {
         state.returnDate = selectedDates[0];
@@ -208,6 +213,38 @@ function initDatePickers() {
       }
     }
   });
+}
+
+// Highlight open (selectable) days so availability is the focal point.
+function markOpenDay(dObj, dStr, fp, dayElem) {
+  if (!dayElem) return;
+  if (dayElem.classList.contains('flatpickr-disabled') ||
+      dayElem.classList.contains('prevMonthDay') ||
+      dayElem.classList.contains('nextMonthDay')) return;
+  dayElem.classList.add('fp-open');
+}
+
+function dayBeforeStr(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
+// The booked nights for a unit (return day stays open for a same-day handover).
+function unitDisabledRanges(unit) {
+  return getBookings()
+    .filter((b) => b.unit === unit)
+    .map((b) => ({ from: b.start, to: dayBeforeStr(b.end) }))
+    .filter((r) => r.to >= r.from);
+}
+
+// Grey out the chosen camper's booked nights on both date pickers so only
+// available days are selectable — makes open dates the obvious choice.
+function applyAvailabilityToPickers() {
+  if (!state.vehicle) return;
+  const ranges = unitDisabledRanges(state.vehicle);
+  if (pickupFlatpickr) pickupFlatpickr.set('disable', ranges);
+  if (returnFlatpickr) returnFlatpickr.set('disable', ranges);
 }
 
 // Booked ranges block pickup/return overlap; the return day itself is
@@ -271,6 +308,7 @@ function selectVehicle(unit, el) {
   if (err) err.style.display = 'none';
   updateSummary();
   checkDateAvailability();
+  applyAvailabilityToPickers();
   if (fullCalendar && activeFilter !== 'all') {
     filterCalendar(unit, null);
     document.querySelectorAll('.cal-filter-btn').forEach(b => {
