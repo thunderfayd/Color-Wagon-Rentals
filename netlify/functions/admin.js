@@ -19,6 +19,7 @@ exports.handler = async (event) => {
   let confirmed = (await store.get('confirmed', { type: 'json' })) || [];
   let requests = (await store.get('requests', { type: 'json' })) || [];
   let log = (await store.get('log', { type: 'json' })) || [];
+  const traffic = (await store.get('traffic', { type: 'json' })) || null;
   let mutatedConfirmed = false;
   let mutatedLog = false;
   confirmed = confirmed.map((b, i) => {
@@ -66,6 +67,8 @@ exports.handler = async (event) => {
   confirmed.sort((a, b) => (a.start < b.start ? -1 : 1));
   requests.sort((a, b) => ((a.receivedAt || '') > (b.receivedAt || '') ? -1 : 1));
 
+  const traffic = (await store.get('traffic', { type: 'json' })) || null;
+
   // Live setup status for the launch checklist (all functions share Netlify env vars).
   const config = {
     signwell: !!(process.env.SIGNWELL_API_KEY && process.env.SIGNWELL_TEMPLATE_ID),
@@ -74,7 +77,7 @@ exports.handler = async (event) => {
     payment_link: process.env.PAYMENT_LINK_URL || process.env.STRIPE_PAYMENT_LINK || ''
   };
 
-  return json(200, { confirmed, requests, log, config });
+  return json(200, { confirmed, requests, log, config, traffic });
 };
 
 function json(status, body) {

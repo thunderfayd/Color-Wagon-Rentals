@@ -62,3 +62,23 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     observer.observe(el);
   });
 })();
+
+// Lightweight, privacy-friendly pageview counter (no cookies, no third parties).
+// Records a view via the Netlify function so stats show on the admin dashboard.
+(function () {
+  try {
+    if (location.pathname.indexOf('admin') !== -1) return; // never count the dashboard itself
+    var vid = localStorage.getItem('cwrVid');
+    var newVisitor = !vid;
+    if (newVisitor) { vid = Math.random().toString(36).slice(2); localStorage.setItem('cwrVid', vid); }
+    var today = new Date().toISOString().split('T')[0];
+    var newDay = localStorage.getItem('cwrVDay') !== today;
+    if (newDay) localStorage.setItem('cwrVDay', today);
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ path: location.pathname, newVisitor: newVisitor, newDay: newDay })
+    }).catch(function () {});
+  } catch (e) { /* analytics is best-effort, never breaks the page */ }
+})();
