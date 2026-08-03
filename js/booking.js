@@ -21,6 +21,11 @@ const CLEANING_FEE = 50;
 // Wisconsin state sales tax (5%) + Manitowoc County (0.5%).
 const SALES_TAX_RATE = 0.055;
 
+// Heidi's Stripe Payment Links (public checkout URLs). Vans are self-serve;
+// the trailer is delivery-only and coordinated by email, so no link.
+const PAY_LINK_DAILY = 'https://buy.stripe.com/5kQ6oA28xbgB37ofCq0RG00';
+const PAY_LINK_WEEKLY = 'https://buy.stripe.com/aFafZafZnbgBfUa2PE0RG02';
+
 function priceBreakdown(nights) {
   const base = estimatePrice(nights);
   const cleaning = CLEANING_FEE;
@@ -679,6 +684,28 @@ function submitBooking() {
         ? '<span style="color:var(--green-dark);">✓ Signed</span>'
         : '<span style="color:var(--gertrude);">Sent to your email</span>') +
       card('Booking Status', '<span style="color:var(--gertrude);">⏳ Pending Confirmation</span>');
+  }
+
+  // Payment: vans are self-serve via Stripe; the trailer is coordinated by email.
+  const pay = document.getElementById('paySection');
+  if (pay) {
+    if (u.priced) {
+      const weekly = state.nights >= 7;
+      const link = weekly ? PAY_LINK_WEEKLY : PAY_LINK_DAILY;
+      const bd = priceBreakdown(state.nights);
+      pay.innerHTML =
+        '<div style="background:var(--cream); border-radius:var(--radius); padding:1.5rem; margin-top:1.5rem; text-align:center;">' +
+          '<h4 style="margin-bottom:0.4rem;">Pay &amp; lock in your dates</h4>' +
+          '<p style="color:var(--gray); font-size:0.9rem; margin-bottom:1rem;">Secure checkout with Stripe. Estimated total <strong>' + money(bd.total) + '</strong> (' + (weekly ? 'weekly rate' : '$99/night') + ' + $50 cleaning fee + WI tax). Final amount is confirmed by Heidi &amp; Will.</p>' +
+          '<a href="' + link + '" target="_blank" rel="noopener" class="btn btn-coral btn-lg">&#128179; Pay Now (Stripe) &rarr;</a>' +
+        '</div>';
+    } else {
+      pay.innerHTML =
+        '<div style="background:var(--cream); border-radius:var(--radius); padding:1.5rem; margin-top:1.5rem; text-align:center;">' +
+          '<h4 style="margin-bottom:0.4rem;">Reserving the Trailer</h4>' +
+          '<p style="color:var(--gray); font-size:0.9rem;">The trailer is delivery &amp; setup only, so dates are coordinated with us directly. Email <a href="mailto:ColorWagonRentals@gmail.com">ColorWagonRentals@gmail.com</a> and Heidi will get it set up and send an invoice.</p>' +
+        '</div>';
+    }
   }
 
   goToStep(6);
