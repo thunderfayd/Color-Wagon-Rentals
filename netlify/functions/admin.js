@@ -67,8 +67,6 @@ exports.handler = async (event) => {
   confirmed.sort((a, b) => (a.start < b.start ? -1 : 1));
   requests.sort((a, b) => ((a.receivedAt || '') > (b.receivedAt || '') ? -1 : 1));
 
-  const traffic = (await store.get('traffic', { type: 'json' })) || null;
-
   // Live setup status for the launch checklist (all functions share Netlify env vars).
   const config = {
     signwell: !!(process.env.SIGNWELL_API_KEY && process.env.SIGNWELL_TEMPLATE_ID),
