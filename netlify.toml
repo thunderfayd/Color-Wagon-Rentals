@@ -13,7 +13,8 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Long-cache static assets (images, css, js) — they're versioned by content.
+# Photos can be cached hard. They are large, they rarely change, and when they
+# do they get a new filename.
 [[headers]]
   for = "/colorwagonrentals/*"
   [headers.values]
@@ -22,17 +23,29 @@
 [[headers]]
   for = "/panopics/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000"
+    Cache-Control = "public, max-age=604800"
 
+# Code must NOT be cached hard. These used to sit at max-age=604800 with a
+# comment claiming they were versioned by content, but the filenames are plain
+# (style.css, tour.js), so nothing busted the cache when they changed. A
+# visitor ended up running a week-old tour.js against freshly deployed markup;
+# the old script referenced an element the new HTML no longer had, threw, and
+# left a dead panorama on the page. Revalidating costs one cheap 304 and keeps
+# script and markup shipping as a matched pair.
 [[headers]]
   for = "/css/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Sensible security headers for a static marketing site.
 [[headers]]

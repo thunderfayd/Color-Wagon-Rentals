@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/tour.css?v=2" />
+  <link rel="stylesheet" href="css/tour.css?v=3" />
 </head>
 <body>
   <a class="skip-link" href="#gertrude">Skip to content</a>
@@ -78,38 +78,30 @@
 
   <div class="container">
 
-    <!-- Interior tour: drag to look around, tap the numbers -->
+    <!-- Interior tour: a map with pins. Tap one and it takes you into that photo. -->
     <div class="unit-detail" id="tour" style="display:block; margin-bottom:3rem;">
       <div style="text-align:center; max-width:640px; margin:0 auto 1.5rem;">
         <span class="section-label">Have a look inside</span>
         <h2 style="margin:0.4rem 0 0.6rem;">Take the Tour</h2>
-        <p style="color:var(--gray);">Drag to look around the camper. Pick a stop and the view swings to it and shows you the close-up.</p>
+        <p style="color:var(--gray);">The whole camper is laid out below. Tap any number and it takes you straight into a close-up of that spot.</p>
       </div>
 
-      <div class="tour" data-tour aria-label="Interior tour of the camper. Drag to pan, or use the left and right arrow keys.">
-        <div class="tour-viewport">
-          <div class="tour-plane">
-            <picture>
-              <source srcset="colorwagonrentals/tour/van-interior-4200.webp" media="(min-width: 900px)" type="image/webp">
-              <source srcset="colorwagonrentals/tour/van-interior-2100.webp" type="image/webp">
-              <img src="colorwagonrentals/tour/van-interior.jpg"
-                   alt="Panoramic view inside a Color Wagon camper: rear kitchen, blackout privacy curtains, a made-up queen bed, the driver's cab and the open side door"
-                   width="4200" height="935" decoding="async">
-            </picture>
+      <div class="tour" data-tour aria-label="Interior tour of the camper. Choose a numbered stop to see it up close.">
+        <div class="tour-stage">
+          <div class="tour-scene tour-scene-overview is-active" data-scene="overview">
+            <div class="tour-map">
+              <picture>
+                <source srcset="colorwagonrentals/tour/van-interior-4200.webp" media="(min-width: 900px)" type="image/webp">
+                <source srcset="colorwagonrentals/tour/van-interior-2100.webp" type="image/webp">
+                <img class="tour-map-img" src="colorwagonrentals/tour/van-interior.jpg"
+                     alt="The inside of a Color Wagon camper end to end: rear kitchen, blackout privacy curtains, a made-up queen bed, the driver's cab and the open side door"
+                     width="4200" height="935" decoding="async">
+              </picture>
+            </div>
+            <p class="tour-map-hint">Tap a number to step inside</p>
           </div>
-          <div class="tour-hint">Drag to look around</div>
-          <div class="tour-rail"><span></span></div>
         </div>
-      </div>
-
-      <div class="tour-strip" role="group" aria-label="Tour stops"></div>
-
-      <div class="tour-panel" role="region" aria-live="polite">
-        <img class="tour-panel-img" alt="" width="1000" height="750" decoding="async">
-        <div class="tour-panel-copy">
-          <h4></h4>
-          <p></p>
-        </div>
+        <div class="tour-strip" role="group" aria-label="Tour stops"></div>
       </div>
     </div>
 
@@ -368,6 +360,6 @@
   </footer>
 
   <script src="js/main.js"></script>
-  <script src="js/tour.js?v=2"></script>
+  <script src="js/tour.js?v=3"></script>
 </body>
 </html>
