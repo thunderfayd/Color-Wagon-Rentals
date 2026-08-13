@@ -201,21 +201,36 @@
       setTimeout(() => { b.style.display = 'none'; }, 3500);
     }
 
+    // Which tab is on screen. Only the visible one gets re-rendered; the
+    // others are marked stale and redrawn when you switch to them.
+    let VIEW = 'bookings';
+    const STALE = { bookings: false, analytics: false, checklist: false };
+
     function showView(name) {
+      VIEW = name;
       ['bookings', 'analytics', 'checklist'].forEach((v) => {
         $('view-' + v).classList.toggle('active', v === name);
         $('tab-' + v).classList.toggle('active', v === name);
       });
+      if (STALE[name]) { drawView(name); STALE[name] = false; }
+    }
+
+    function drawView(name) {
+      if (name === 'bookings') { renderRequests(REQUESTS); renderConfirmed(CONFIRMED); }
+      else if (name === 'analytics') renderAnalytics();
+      else if (name === 'checklist') renderChecklist();
     }
 
     async function login() {
       password = $('pw').value;
-      const { status } = await api('list');
+      // One request, not two: the login check already returns the dashboard
+      // payload, so hand it straight to ingest instead of calling refresh().
+      const { status, data } = await api('list');
       if (status === 200) {
         sessionStorage.setItem('cwrAdminPw', password);
         $('loginView').style.display = 'none';
         $('dashView').style.display = 'block';
-        refresh();
+        ingest(data);
       } else {
         $('loginError').style.display = 'block';
       }
@@ -234,18 +249,26 @@
     function money(n) { return '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
     function daysBetween(a, b) { return Math.max(0, Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000)); }
 
+    let refreshing = false;
+
     async function refresh() {
-      const { status, data } = await api('list');
-      if (status !== 200) { banner('Session expired, log in again.', false); logout(); return; }
-      CONFIRMED = data.confirmed || [];
-      REQUESTS = data.requests || [];
-      LOG = data.log || [];
-      CONFIG = data.config || {};
-      TRAFFIC = data.traffic || null;
-      renderRequests(REQUESTS);
-      renderConfirmed(CONFIRMED);
-      renderAnalytics();
-      renderChecklist();
+      // A slow response used to let the next poll start on top of this one.
+      if (refreshing) return;
+      refreshing = true;
+      try {
+        const { status, data } = await api('list');
+        if (status !== 200) { banner('Session expired, log in again.', false); logout(); return; }
+        CONFIRMED = data.confirmed || [];
+        REQUESTS = data.requests || [];
+        LOG = data.log || [];
+        CONFIG = data.config || {};
+        TRAFFIC = data.traffic || null;
+        drawView(VIEW);
+        Object.keys(STALE).forEach((v) => { if (v !== VIEW) STALE[v] = true; });
+        if (VIEW !== 'checklist') renderChecklist();
+      } finally {
+        refreshing = false;
+      }
     }
 
     function renderRequests(reqs) {
@@ -448,10 +471,12 @@
       if (data.log) LOG = data.log;
       if (data.config) CONFIG = data.config;
       if (data.traffic !== undefined) TRAFFIC = data.traffic;
-      renderRequests(REQUESTS);
-      renderConfirmed(CONFIRMED);
-      renderAnalytics();
-      renderChecklist();
+      // Draw what is on screen now; flag the rest to redraw on tab switch.
+      drawView(VIEW);
+      Object.keys(STALE).forEach((v) => { if (v !== VIEW) STALE[v] = true; });
+      // The checklist badge shows on the tab itself, so it has to stay current
+      // even while the checklist view is hidden.
+      if (VIEW !== 'checklist') renderChecklist();
     }
 
     $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
@@ -466,8 +491,39 @@
         }
       });
     }
-    // Keep the dashboard fresh.
-    setInterval(() => { if ($('dashView').style.display === 'block') refresh(); }, 30000);
+    // Keep the dashboard fresh, but only while somebody is actually looking.
+    // The old version polled every 30s forever, so a tab left open all day
+    // made roughly 2,900 calls to the function and the Blobs store for
+    // nothing. Now polling stops when the tab is hidden and the dashboard
+    // refreshes the moment you come back, which is also when you want it.
+    const POLL_MS = 30000;
+    let pollTimer = null;
+
+    function dashVisible() {
+      return $('dashView').style.display === 'block';
+    }
+
+    function startPolling() {
+      if (pollTimer) return;
+      pollTimer = setInterval(() => { if (dashVisible()) refresh(); }, POLL_MS);
+    }
+
+    function stopPolling() {
+      if (!pollTimer) return;
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (dashVisible()) refresh();   // catch up straight away
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    });
+
+    if (document.visibilityState === 'visible') startPolling();
   </script>
 </body>
 </html>

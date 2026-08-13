@@ -89,38 +89,66 @@
   100% { opacity: 0; }
 }
 
-/* ---- caption ---- */
-.tour-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 1rem 1.15rem 1.1rem;
-  background: linear-gradient(to top, rgba(12, 30, 20, 0.94) 60%, rgba(12, 30, 20, 0));
-  color: #FFF9EF;
-  transform: translateY(100%);
-  transition: transform 0.22s ease;
+/* ---- stop strip ---- */
+.tour-strip {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
 }
-.tour-caption.is-open { transform: translateY(0); }
-.tour-caption h4 {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  margin: 0 0 0.25rem;
-  color: #FFF9EF;
-}
-.tour-caption p { margin: 0; font-size: 0.88rem; line-height: 1.5; color: rgba(255, 249, 239, 0.9); }
-.tour-caption-close {
-  position: absolute;
-  top: 0.55rem;
-  right: 0.7rem;
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 249, 239, 0.4);
-  background: rgba(0, 0, 0, 0.25);
-  color: #FFF9EF;
-  font-size: 1.1rem;
-  line-height: 1;
+.tour-chip {
+  flex: 0 0 auto;
+  width: 128px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md, 12px);
+  background: var(--white, #fff);
+  padding: 0;
   cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.tour-chip img { display: block; width: 100%; height: 78px; object-fit: cover; }
+.tour-chip span {
+  display: block;
+  padding: 0.4rem 0.5rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.tour-chip:hover { transform: translateY(-2px); }
+.tour-chip.is-active { border-color: var(--green, #1E7A46); }
+.tour-chip:focus-visible { outline: 2px solid var(--green, #1E7A46); outline-offset: 2px; }
+
+/* ---- destination panel ---- */
+.tour-panel {
+  display: none;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+.tour-panel.is-open { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.tour-panel-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.tour-panel-copy h4 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin: 0 0 0.5rem;
+  color: var(--green-dark);
+}
+.tour-panel-copy p { margin: 0; color: var(--gray); line-height: 1.6; }
+
+@media (max-width: 760px) {
+  .tour-panel.is-open { grid-template-columns: 1fr; gap: 0.9rem; }
+  .tour-chip { width: 108px; }
 }
 
 /* ---- hint + progress ---- */
