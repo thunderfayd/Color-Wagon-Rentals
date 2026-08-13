@@ -30,13 +30,25 @@
   function init(root) {
     var viewport = root.querySelector('.tour-viewport');
     var plane    = root.querySelector('.tour-plane');
-    var img      = plane.querySelector('img');
-    var strip    = root.parentNode.querySelector('.tour-strip');
-    var panel    = root.parentNode.querySelector('.tour-panel');
-    var pImg     = panel.querySelector('.tour-panel-img');
-    var pTitle   = panel.querySelector('h4');
-    var pText    = panel.querySelector('p');
+    var img      = plane && plane.querySelector('img');
+    var scope    = root.parentNode || document;
+    var strip    = scope.querySelector('.tour-strip');
+    var panel    = scope.querySelector('.tour-panel');
+    var pImg     = panel && panel.querySelector('.tour-panel-img');
+    var pTitle   = panel && panel.querySelector('h4');
+    var pText    = panel && panel.querySelector('p');
     var railFill = root.querySelector('.tour-rail span');
+
+    // If the markup and this script ever fall out of step (a cached copy of
+    // one paired with a fresh copy of the other), bail out quietly instead of
+    // throwing partway through and leaving a dead, undraggable panorama on the
+    // page. Worst case the visitor sees a plain photo, which still works.
+    if (!viewport || !plane || !img || !strip || !panel || !pImg || !pTitle || !pText) {
+      if (window.console && console.warn) {
+        console.warn('[tour] markup and script are out of step, skipping enhancement');
+      }
+      return;
+    }
 
     var maxScroll = 0, pos = 0, current = null;
 
