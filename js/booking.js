@@ -573,35 +573,10 @@ function submitBooking() {
     submittedAt: new Date().toISOString()
   });
 
-  // Deliver the request to Heidi & Will via Netlify Forms (no backend needed).
-  // Fails silently if previewing locally - the confirmation still shows and the
-  // request is preserved in localStorage above.
-  const payload = new URLSearchParams({
-    'form-name': 'booking',
-    confirmation_id: id,
-    camper: u.name || state.vehicle,
-    pickup_date: startStr,
-    return_date: endStr,
-    nights: String(state.nights),
-    estimated_total: u.priced ? money(priceBreakdown(state.nights).total) : 'Contact for pricing',
-    first_name: state.firstName,
-    last_name: state.lastName,
-    email: state.email,
-    phone: state.phone,
-    address: state.address,
-    date_of_birth: state.dob,
-    license_number: state.licenseNum,
-    license_state: state.licenseState,
-    group_size: state.groupSize,
-    destination: state.destination,
-    special_requests: state.specialRequests,
-    agreement_signed: 'handled directly by Heidi'
-  });
-  fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
-    .catch(() => { /* offline / local preview - request is still saved locally */ });
-
-  // Also store the request in the live system so it appears in Heidi & Will's
-  // dashboard and can be confirmed with one click. Best-effort; never blocks.
+  // Send the request to Heidi & Will. This is the only delivery path now: the
+  // Netlify Forms POST that used to sit above it always came back 404, because
+  // Forms was never enabled on this site, and the failure was swallowed. The
+  // function saves the request and emails them about it.
   fetch('/api/request-booking', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -615,7 +590,7 @@ function submitBooking() {
       destination: state.destination, special_requests: state.specialRequests,
       submittedAt: new Date().toISOString()
     })
-  }).catch(() => { /* not deployed yet - request still delivered via Netlify Forms */ });
+  }).catch(() => { /* local preview: the request is still saved in localStorage above */ });
 
   document.getElementById('confirmationId').textContent = id;
   const emailEl = document.getElementById('confirmEmail');

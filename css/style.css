@@ -1192,6 +1192,29 @@ footer {
 }
 .trust-badge .icon { display: inline-flex; color: var(--green); flex-shrink: 0; }
 .trust-badge .icon svg { width: 18px; height: 18px; }
+/* Contact form result states. The failure box is new: this form had no way to
+   report a failure, which is how a broken delivery path went unnoticed. */
+.contact-tick {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgba(30, 122, 70, 0.12);
+  color: var(--green);
+  display: grid;
+  place-items: center;
+}
+.contact-tick svg { width: 32px; height: 32px; }
+#contactError {
+  background: #FEF2F2;
+  border: 1.5px solid #FCA5A5;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin-top: 1rem;
+}
+#contactError p { font-size: 0.9rem; line-height: 1.6; color: #7F1D1D; margin: 0; }
+#contactError a { color: #7F1D1D; font-weight: 800; text-decoration: underline; }
+
 /* Sits under the agreement checkboxes, where the licence number is asked for. */
 .form-privacy-note {
   font-size: 0.84rem;

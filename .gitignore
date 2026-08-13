@@ -14,3 +14,7 @@ Thumbs.db
 # Raw camera originals: converted versions live in colorwagonrentals/
 *.HEIC
 _sheet/
+
+# Netlify CLI scratch (created by `netlify dev`)
+.netlify
+deno.lock

@@ -27,6 +27,9 @@
     .unit-violet { background: var(--violet); }
     .unit-trailer { background: var(--trailer); }
     .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    /* An unread message should be findable at a glance in a long list. */
+    .row-item.unread { border-color: var(--green); background: rgba(30, 122, 70, 0.04); }
+    .msg-body { white-space: pre-wrap; margin-top: 0.6rem; line-height: 1.6; }
     .empty { color: var(--gray); font-style: italic; padding: 0.5rem 0; }
     .login-box { max-width: 420px; margin: 4rem auto; }
     .add-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end; }
@@ -98,6 +101,7 @@
 
       <div class="tabs">
         <button class="tab-btn active" id="tab-bookings" onclick="showView('bookings')">Bookings</button>
+        <button class="tab-btn" id="tab-messages" onclick="showView('messages')">Messages <span class="pill" id="msgPill" style="display:none;">0</span></button>
         <button class="tab-btn" id="tab-analytics" onclick="showView('analytics')">Analytics</button>
         <button class="tab-btn" id="tab-checklist" onclick="showView('checklist')">Launch Checklist <span class="pill" id="chkPill" style="display:none;">0</span></button>
       </div>
@@ -141,6 +145,14 @@
         </div>
       </div>
 
+      <!-- ===== MESSAGES VIEW ===== -->
+      <div class="view" id="view-messages">
+        <div class="admin-card">
+          <h2>Messages from the website <span class="pill" id="msgCount">0</span></h2>
+          <div id="messages"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
       <!-- ===== ANALYTICS VIEW ===== -->
       <div class="view" id="view-analytics">
         <div class="admin-card">
@@ -181,7 +193,7 @@
   <script>
     const $ = (id) => document.getElementById(id);
     let password = sessionStorage.getItem('cwrAdminPw') || '';
-    let CONFIG = {}, LOG = [], CONFIRMED = [], REQUESTS = [], TRAFFIC = null;
+    let CONFIG = {}, LOG = [], CONFIRMED = [], REQUESTS = [], TRAFFIC = null, MESSAGES = [];
 
     async function api(action, extra) {
       const res = await fetch('/api/admin', {
@@ -204,11 +216,11 @@
     // Which tab is on screen. Only the visible one gets re-rendered; the
     // others are marked stale and redrawn when you switch to them.
     let VIEW = 'bookings';
-    const STALE = { bookings: false, analytics: false, checklist: false };
+    const STALE = { bookings: false, messages: false, analytics: false, checklist: false };
 
     function showView(name) {
       VIEW = name;
-      ['bookings', 'analytics', 'checklist'].forEach((v) => {
+      ['bookings', 'messages', 'analytics', 'checklist'].forEach((v) => {
         $('view-' + v).classList.toggle('active', v === name);
         $('tab-' + v).classList.toggle('active', v === name);
       });
@@ -217,6 +229,7 @@
 
     function drawView(name) {
       if (name === 'bookings') { renderRequests(REQUESTS); renderConfirmed(CONFIRMED); }
+      else if (name === 'messages') renderMessages();
       else if (name === 'analytics') renderAnalytics();
       else if (name === 'checklist') renderChecklist();
     }
@@ -261,6 +274,7 @@
         CONFIRMED = data.confirmed || [];
         REQUESTS = data.requests || [];
         LOG = data.log || [];
+        MESSAGES = data.messages || [];
         CONFIG = data.config || {};
         TRAFFIC = data.traffic || null;
         drawView(VIEW);
@@ -406,6 +420,56 @@
         </div>`).join('') : '<div class="empty">No upcoming trips.</div>';
     }
 
+    // ---------- Messages ----------
+    function renderMessages() {
+      const unread = MESSAGES.filter((m) => !m.read).length;
+      $('msgCount').textContent = MESSAGES.length;
+      const pill = $('msgPill');
+      if (unread > 0) { pill.style.display = 'inline-block'; pill.textContent = unread; }
+      else { pill.style.display = 'none'; }
+
+      if (!MESSAGES.length) {
+        $('messages').innerHTML = '<div class="empty">No messages yet. Anything sent through the contact form on the website lands here.</div>';
+        return;
+      }
+      $('messages').innerHTML = MESSAGES.map((m) => `
+        <div class="row-item${m.read ? '' : ' unread'}">
+          <div class="top">
+            <div>
+              <strong>${esc(m.name)}</strong>${m.interested_in ? ' &middot; <span class="muted">' + esc(m.interested_in) + '</span>' : ''}
+              ${m.read ? '' : '<span class="pill">new</span>'}
+            </div>
+            <span class="muted">${when(m.receivedAt)}</span>
+          </div>
+          <div class="msg-body">${esc(m.message)}</div>
+          <div class="muted" style="margin:0.5rem 0 0.75rem;">
+            <a href="mailto:${esc(m.email)}?subject=${encodeURIComponent('Re: your message to Color Wagon Rentals')}">${esc(m.email)}</a>
+            ${m.phone ? ' &middot; <a href="tel:' + esc(m.phone.replace(/[^0-9+]/g, '')) + '">' + esc(m.phone) + '</a>' : ''}
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary btn-sm" href="mailto:${esc(m.email)}?subject=${encodeURIComponent('Re: your message to Color Wagon Rentals')}">Reply</a>
+            ${m.read ? '' : `<button class="btn btn-secondary btn-sm" onclick="markRead('${m.id}')">Mark read</button>`}
+            <button class="btn btn-secondary btn-sm" onclick="delMessage('${m.id}')">Delete</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function when(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d)) return '';
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
+             d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+
+    async function markRead(id) { const { data } = await api('message-read', { id }); ingest(data); }
+    async function delMessage(id) {
+      if (!confirm('Delete this message? It cannot be brought back.')) return;
+      const { data } = await api('message-delete', { id });
+      banner('Message deleted.', true);
+      ingest(data);
+    }
+
     // ---------- Launch checklist ----------
     function renderChecklist() {
       const onDomain = /colorwagonrentals\.com$/.test(location.hostname);
@@ -427,6 +491,15 @@
                 '<li>For automatic charge-at-booking (Stripe Checkout), your developer wires it into the booking flow once you decide the amounts.</li>' +
               '</ol>' +
               'Right now the site tells renters "we\'ll contact you within 24 hours to arrange the deposit," which is a fine interim step.' },
+        { title: 'Email alerts for messages &amp; bookings', status: CONFIG.notify ? 'done' : 'todo',
+          body: CONFIG.notify
+            ? ('Working. New messages and booking requests are emailed to <code>' + esc(CONFIG.notify_to || '') + '</code> the moment they come in.')
+            : '<strong>Nothing is being emailed to you right now.</strong> Messages and booking requests are saved here and are safe, but you only see them by opening this dashboard. To get an email the moment one arrives: ' +
+              '<ol>' +
+                '<li>Make a free account at <code>resend.com</code> and add <code>colorwagonrentals.com</code> as a sending domain.</li>' +
+                '<li>In Netlify  Site settings  Environment variables, add <code>RESEND_API_KEY</code> (the key they give you) and <code>NOTIFY_FROM</code> (for example <code>site@colorwagonrentals.com</code>).</li>' +
+                '<li>Redeploy. This row turns green on its own once it is working.</li>' +
+              '</ol>' },
         { title: 'Confirm Wisconsin sales-tax rate', status: 'action',
           body: 'The site currently adds <strong>5.5%</strong> (WI state 5% + Manitowoc County 0.5%) on top of the rental + $50 cleaning fee. Confirm this is correct for your situation; tell your developer if it should change.' },
         { title: 'Set www as the primary domain (optional)', status: onDomain ? 'done' : 'action',
@@ -469,6 +542,7 @@
       CONFIRMED = data.confirmed || CONFIRMED;
       REQUESTS = data.requests || REQUESTS;
       if (data.log) LOG = data.log;
+      if (data.messages) MESSAGES = data.messages;
       if (data.config) CONFIG = data.config;
       if (data.traffic !== undefined) TRAFFIC = data.traffic;
       // Draw what is on screen now; flag the rest to redraw on tab switch.

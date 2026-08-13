@@ -1,6 +1,7 @@
 // Password-protected admin API for Heidi & Will's dashboard.
 // Requires the ADMIN_PASSWORD environment variable set in Netlify.
 const { getStore, connectLambda } = require('@netlify/blobs');
+const { configured: notifyConfigured } = require('../lib/notify');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'method_not_allowed' });
@@ -19,9 +20,11 @@ exports.handler = async (event) => {
   let confirmed = (await store.get('confirmed', { type: 'json' })) || [];
   let requests = (await store.get('requests', { type: 'json' })) || [];
   let log = (await store.get('log', { type: 'json' })) || [];
+  let messages = (await store.get('messages', { type: 'json' })) || [];
   const traffic = (await store.get('traffic', { type: 'json' })) || null;
   let mutatedConfirmed = false;
   let mutatedLog = false;
+  let mutatedMessages = false;
   confirmed = confirmed.map((b, i) => {
     if (!b.id) { mutatedConfirmed = true; return { id: 'S-' + i + '-' + Date.now().toString(36), ...b }; }
     return b;
@@ -56,26 +59,39 @@ exports.handler = async (event) => {
     const before = confirmed.length;
     confirmed = confirmed.filter((x) => x.id !== body.id);
     mutatedConfirmed = mutatedConfirmed || confirmed.length !== before;
+  } else if (action === 'message-read') {
+    const m = messages.find((x) => x.id === body.id);
+    if (m && !m.read) { m.read = true; mutatedMessages = true; }
+  } else if (action === 'message-delete') {
+    const before = messages.length;
+    messages = messages.filter((x) => x.id !== body.id);
+    mutatedMessages = messages.length !== before;
   } else if (action !== 'list') {
     return json(400, { error: 'unknown_action' });
   }
 
   if (mutatedConfirmed) await store.setJSON('confirmed', confirmed);
   if (mutatedLog) await store.setJSON('log', log);
+  if (mutatedMessages) await store.setJSON('messages', messages);
 
   // Sort for a tidy dashboard.
   confirmed.sort((a, b) => (a.start < b.start ? -1 : 1));
   requests.sort((a, b) => ((a.receivedAt || '') > (b.receivedAt || '') ? -1 : 1));
+  messages.sort((a, b) => ((a.receivedAt || '') > (b.receivedAt || '') ? -1 : 1));
 
   // Live setup status for the launch checklist (all functions share Netlify env vars).
   const config = {
     signwell: !!(process.env.SIGNWELL_API_KEY && process.env.SIGNWELL_TEMPLATE_ID),
     signwell_test: process.env.SIGNWELL_TEST_MODE === 'true',
     payment: !!(process.env.PAYMENT_LINK_URL || process.env.STRIPE_PAYMENT_LINK || process.env.STRIPE_SECRET_KEY),
-    payment_link: process.env.PAYMENT_LINK_URL || process.env.STRIPE_PAYMENT_LINK || ''
+    payment_link: process.env.PAYMENT_LINK_URL || process.env.STRIPE_PAYMENT_LINK || '',
+    // Whether an incoming message or booking actually reaches an inbox, as
+    // opposed to only sitting in here waiting to be noticed.
+    notify: notifyConfigured(),
+    notify_to: process.env.NOTIFY_TO || 'ColorWagonRentals@gmail.com'
   };
 
-  return json(200, { confirmed, requests, log, config, traffic });
+  return json(200, { confirmed, requests, log, messages, config, traffic });
 };
 
 function json(status, body) {

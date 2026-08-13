@@ -384,9 +384,8 @@
         <div class="contact-form">
           <h3 style="margin-bottom:0.5rem;">Send Us a Message</h3>
           <p style="color:var(--gray); margin-bottom:1.5rem;">We're a family business, and we'll get back to you as soon as we can, usually within 24 hours.</p>
-          <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleContactForm(event)">
-            <input type="hidden" name="form-name" value="contact" />
-            <p hidden><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+          <form id="contactForm" name="contact" method="POST" onsubmit="handleContactForm(event)">
+            <p hidden><label>Don't fill this out if you're human: <input name="bot-field" autocomplete="off" tabindex="-1" /></label></p>
             <div class="form-row">
               <div class="form-group">
                 <label for="c_name">Your Name</label>
@@ -413,14 +412,17 @@
             </div>
             <div class="form-group">
               <label for="c_msg">Message</label>
-              <textarea id="c_msg" name="message" placeholder="Tell us about your trip: dates, destination, group size, any questions..."></textarea>
+              <textarea id="c_msg" name="message" required placeholder="Tell us about your trip: dates, destination, group size, any questions..."></textarea>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;">Send Message</button>
           </form>
           <div id="contactSuccess" role="status" aria-live="polite" style="display:none; text-align:center; padding:2rem;">
-            <div style="font-size:3rem; margin-bottom:1rem;"></div>
+            <div class="contact-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
             <h4>Message Sent!</h4>
             <p style="color:var(--gray);">Thanks! We'll be in touch within 24 hours.</p>
+          </div>
+          <div id="contactError" role="alert" style="display:none;">
+            <p><strong>That did not go through.</strong> Something on our end is not working, and we would rather tell you than let your message disappear. Reach us directly at <a href="mailto:ColorWagonRentals@gmail.com">ColorWagonRentals@gmail.com</a> or <a href="tel:9203201270">(920) 320-1270</a>, and we will get right back to you.</p>
           </div>
         </div>
       </div>
@@ -507,19 +509,43 @@
 
   <script src="js/main.js"></script>
   <script>
-    function handleContactForm(e) {
+    // This used to POST to "/" for Netlify Forms and call it a success either
+    // way. Forms was never enabled on this site, so every one of those came
+    // back 404 and the message was thrown away behind a green checkmark. It
+    // now goes to a function that saves it before it tries to email it, and a
+    // failure says so instead of pretending.
+    async function handleContactForm(e) {
       e.preventDefault();
       const form = document.getElementById('contactForm');
-      const showSuccess = () => {
+      const btn = form.querySelector('button[type="submit"]');
+      const fail = document.getElementById('contactError');
+      const f = new FormData(form);
+
+      fail.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: f.get('name'),
+            email: f.get('email'),
+            phone: f.get('phone'),
+            interested_in: f.get('interested_in'),
+            message: f.get('message'),
+            company: f.get('bot-field')
+          })
+        });
+        if (!res.ok) throw new Error('status ' + res.status);
         form.style.display = 'none';
         document.getElementById('contactSuccess').style.display = 'block';
-      };
-      // Submit to Netlify Forms in the background, then show the success state.
-      // If the POST fails (e.g. previewing locally), we still confirm to the user.
-      const data = new URLSearchParams(new FormData(form));
-      fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: data.toString() })
-        .then(showSuccess)
-        .catch(showSuccess);
+      } catch (err) {
+        fail.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+      }
     }
   </script>
 </body>
