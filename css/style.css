@@ -539,7 +539,6 @@ h4 { font-size: 1.1rem; }
   font-weight: 700;
   color: #44514A;
 }
-.spec-icon { font-size: 1rem; }
 .fleet-card-price { margin-top: auto; margin-bottom: 1rem; }
 .price-num {
   font-family: var(--font-display);
@@ -626,6 +625,19 @@ h4 { font-size: 1.1rem; }
   font-weight: 700;
   color: #44514A;
 }
+/* Drawn checkmark, replaces the emoji that used to sit in these badges.
+   Only .feature-check, never .req-icon: those badges hold the step numbers
+   1 to 5 on the booking page and must not get a tick on top of the digit. */
+.feature-check::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
 .feature-check {
   width: 22px;
   height: 22px;

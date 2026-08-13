@@ -95,9 +95,9 @@ function saveBooking(booking) {
 
 // ---- Unit config ----
 const UNITS = {
-  gertrude: { name: 'Gertrude', priced: true, color: '#C2700E', emoji: '🍂', sleeps: 2 },
-  violet:   { name: 'Violet',   priced: true, color: '#7C3AED', emoji: '🐸', sleeps: 2 },
-  trailer:  { name: 'The Trailer', priced: false, color: '#B45309', emoji: '🏕️', sleeps: 6 }
+  gertrude: { name: 'Gertrude', priced: true, color: '#C2700E', sleeps: 2 },
+  violet:   { name: 'Violet',   priced: true, color: '#7C3AED', sleeps: 2 },
+  trailer:  { name: 'The Trailer', priced: false, color: '#B45309', sleeps: 6 }
 };
 
 // ---- FullCalendar (availability overview) ----
@@ -244,7 +244,7 @@ function unitDisabledRanges(unit) {
 }
 
 // Grey out the chosen camper's booked nights on both date pickers so only
-// available days are selectable — makes open dates the obvious choice.
+// available days are selectable, which makes open dates the obvious choice.
 function applyAvailabilityToPickers() {
   if (!state.vehicle) return;
   const ranges = unitDisabledRanges(state.vehicle);
@@ -283,14 +283,14 @@ function checkDateAvailability() {
 
   if (nights < 1) {
     conflictAlert.style.display = 'block';
-    conflictAlert.textContent = '⚠️ Return date must be after your pickup date.';
+    conflictAlert.textContent = ' Return date must be after your pickup date.';
     okAlert.style.display = 'none';
     return;
   }
 
   if (state.vehicle && hasConflict(state.vehicle, state.pickupDate, state.returnDate)) {
     conflictAlert.style.display = 'block';
-    conflictAlert.textContent = '⚠️ Those dates overlap with an existing booking for ' + UNITS[state.vehicle].name + '. Please choose different dates or the other van.';
+    conflictAlert.textContent = ' Those dates overlap with an existing booking for ' + UNITS[state.vehicle].name + '. Please choose different dates or the other van.';
     okAlert.style.display = 'none';
     return;
   }
@@ -459,7 +459,7 @@ function updateSummary() {
   const rows = [];
   if (state.vehicle) {
     const u = UNITS[state.vehicle];
-    rows.push(['Camper', u.emoji + ' ' + u.name]);
+    rows.push(['Camper', u.name]);
   }
   if (state.pickupDate) rows.push(['Pickup', formatDate(state.pickupDate)]);
   if (state.returnDate) {
@@ -514,7 +514,7 @@ function buildReviewSummary() {
       </div>`;
   el.innerHTML = `
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-      ${cell('Camper', (u.emoji || '') + ' ' + (u.name || state.vehicle))}
+      ${cell('Camper', u.name || state.vehicle)}
       ${cell('Guest', state.firstName + ' ' + state.lastName)}
       ${cell('Pickup Date', formatDate(state.pickupDate))}
       ${cell('Return Date', formatDate(state.returnDate))}
@@ -536,7 +536,7 @@ function buildReviewSummary() {
     </div>`;
 }
 
-// ---- Step 4 → validate agreement checkboxes, then move to e-signature ----
+// ---- Step 4  validate agreement checkboxes, then move to e-signature ----
 function proceedToSign() {
   const agree = document.getElementById('agreeTerms');
   const ageCheck = document.getElementById('agreeAge');
@@ -675,15 +675,15 @@ function submitBooking() {
         <div class="value">${value}</div>
       </div>`;
     confDet.innerHTML =
-      card('Camper', (u.emoji || '') + ' ' + (u.name || state.vehicle)) +
+      card('Camper', u.name || state.vehicle) +
       card('Guest Name', state.firstName + ' ' + state.lastName) +
       card('Pickup Date', formatDate(state.pickupDate)) +
       card('Return Date', formatDate(state.returnDate)) +
       card('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : '')) +
       card('Rental Agreement', state.signed
-        ? '<span style="color:var(--green-dark);">✓ Signed</span>'
+        ? '<span style="color:var(--green-dark);">Signed</span>'
         : '<span style="color:var(--gertrude);">Sent to your email</span>') +
-      card('Booking Status', '<span style="color:var(--gertrude);">⏳ Pending Confirmation</span>');
+      card('Booking Status', '<span style="color:var(--gertrude);">Pending Confirmation</span>');
   }
 
   // Payment: vans are self-serve via Stripe; the trailer is coordinated by email.
@@ -697,7 +697,7 @@ function submitBooking() {
         '<div style="background:var(--cream); border-radius:var(--radius); padding:1.5rem; margin-top:1.5rem; text-align:center;">' +
           '<h4 style="margin-bottom:0.4rem;">Pay &amp; lock in your dates</h4>' +
           '<p style="color:var(--gray); font-size:0.9rem; margin-bottom:1rem;">Secure checkout with Stripe. Estimated total <strong>' + money(bd.total) + '</strong> (' + (weekly ? 'weekly rate' : '$99/night') + ' + $50 cleaning fee + WI tax). Final amount is confirmed by Heidi &amp; Will.</p>' +
-          '<a href="' + link + '" target="_blank" rel="noopener" class="btn btn-coral btn-lg">&#128179; Pay Now (Stripe) &rarr;</a>' +
+          '<a href="' + link + '" target="_blank" rel="noopener" class="btn btn-coral btn-lg">Pay Now (Stripe)</a>' +
         '</div>';
     } else {
       pay.innerHTML =

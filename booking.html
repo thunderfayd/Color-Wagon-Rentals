@@ -73,7 +73,7 @@
     }
     .step-dot.active { background: var(--green); border-color: var(--green); color: white; }
     .step-dot.done { background: var(--white); border-color: var(--green); color: var(--green); }
-    .step-dot.done::after { content: '✓'; }
+    .step-dot.done::after { content: ''; width: 5px; height: 9px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -2px; }
     .step-line { flex: 1; height: 3px; border-radius: 3px; background: var(--cream-dark); transition: background 0.3s; }
     .step-line.done { background: var(--green); }
     .step-label-row { display: flex; justify-content: space-between; margin-bottom: 1.6rem; }
@@ -260,10 +260,10 @@
                     <div class="vehicle-option-name">Gertrude</div>
                     <div class="vehicle-option-desc">2008 Ford Econoline: autumn woodland mural, queen bed, Bluetooth radio</div>
                     <div class="vehicle-option-specs">
-                      <span class="vehicle-spec-badge">&#128101; Sleeps 2</span>
-                      <span class="vehicle-spec-badge">&#127911; Bluetooth</span>
-                      <span class="vehicle-spec-badge">&#127859; Rear kitchen</span>
-                      <span class="vehicle-spec-badge">&#128663; You drive</span>
+                      <span class="vehicle-spec-badge">Sleeps 2</span>
+                      <span class="vehicle-spec-badge">Bluetooth</span>
+                      <span class="vehicle-spec-badge">Rear kitchen</span>
+                      <span class="vehicle-spec-badge">You drive</span>
                     </div>
                   </div>
                   <div class="vehicle-option-price">
@@ -280,10 +280,10 @@
                     <div class="vehicle-option-name">Violet</div>
                     <div class="vehicle-option-desc">2013 Ford Econoline: purple pond mural, solar power, CD player</div>
                     <div class="vehicle-option-specs">
-                      <span class="vehicle-spec-badge">&#128101; Sleeps 2</span>
-                      <span class="vehicle-spec-badge">&#9728;&#65039; Solar</span>
-                      <span class="vehicle-spec-badge">&#128191; CD player</span>
-                      <span class="vehicle-spec-badge">&#128663; You drive</span>
+                      <span class="vehicle-spec-badge">Sleeps 2</span>
+                      <span class="vehicle-spec-badge">Solar</span>
+                      <span class="vehicle-spec-badge">CD player</span>
+                      <span class="vehicle-spec-badge">You drive</span>
                     </div>
                   </div>
                   <div class="vehicle-option-price">
@@ -300,9 +300,9 @@
                     <div class="vehicle-option-name">The Trailer</div>
                     <div class="vehicle-option-desc">Sleeps 6, full bathroom, delivered and set up within 15 miles of Manitowoc or Crivitz, WI</div>
                     <div class="vehicle-option-specs">
-                      <span class="vehicle-spec-badge">&#128106; Sleeps 6</span>
-                      <span class="vehicle-spec-badge">&#128230; Delivery incl.</span>
-                      <span class="vehicle-spec-badge">&#128205; Manitowoc/Crivitz</span>
+                      <span class="vehicle-spec-badge">Sleeps 6</span>
+                      <span class="vehicle-spec-badge">Delivery incl.</span>
+                      <span class="vehicle-spec-badge">Manitowoc/Crivitz</span>
                     </div>
                   </div>
                   <div class="vehicle-option-price">
@@ -313,7 +313,7 @@
               <div id="v-error" class="error-msg" style="display:none;">Please select a camper to continue.</div>
               <div class="panel-footer">
                 <span style="color:var(--gray); font-size:0.875rem; font-weight:700;">Step 1 of 6</span>
-                <button class="btn btn-primary" onclick="goToStep(2)">Next: Choose Dates &rarr;</button>
+                <button class="btn btn-primary" onclick="goToStep(2)">Next: Choose Dates</button>
               </div>
             </div>
           </div>
@@ -327,7 +327,7 @@
                 <span><i style="background:rgba(30,122,70,0.18); border:1.5px solid var(--green);"></i> Available</span>
                 <span><i style="background:transparent; border:1.5px solid var(--cream-dark);"></i> <span style="text-decoration:line-through; color:#cbb8a6;">Booked</span></span>
               </div>
-              <div class="alert alert-info">&#128197;&nbsp; <strong>$99 per night or $650 per week.</strong> Includes 100 miles/day ($0.45/mile after). A $50 cleaning &amp; prep fee and Wisconsin sales tax are added to your total. Your balance is due 7 days before your journey begins.</div>
+              <div class="alert alert-info"><strong>$99 per night or $650 per week.</strong>Includes 100 miles/day ($0.45/mile after). A $50 cleaning &amp; prep fee and Wisconsin sales tax are added to your total. Your balance is due 7 days before your journey begins.</div>
 
               <div class="date-range-inputs">
                 <div class="form-group" style="margin-bottom:0;">
@@ -343,16 +343,16 @@
               </div>
 
               <div id="date-conflict-alert" class="alert alert-warning" style="display:none; margin-top:1rem;">
-                &#9888;&#65039; Those dates overlap with an existing booking for the selected camper. Please choose different dates or a different unit.
+                 Those dates overlap with an existing booking for the selected camper. Please choose different dates or a different unit.
               </div>
 
               <div id="date-ok-alert" class="alert alert-success" style="display:none; margin-top:1rem;">
-                &#10003;&nbsp; <strong id="nights-summary"></strong>
+                &nbsp; <strong id="nights-summary"></strong>
               </div>
 
               <div class="panel-footer">
-                <button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
-                <button class="btn btn-primary" onclick="goToStep(3)">Next: Your Info &rarr;</button>
+                <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+                <button class="btn btn-primary" onclick="goToStep(3)">Next: Your Info</button>
               </div>
             </div>
           </div>
@@ -442,8 +442,8 @@
                 <textarea id="specialRequests" rows="2" placeholder="Any questions, accessibility needs, pet inquiries, etc."></textarea>
               </div>
               <div class="panel-footer">
-                <button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
-                <button class="btn btn-primary" onclick="goToStep(4)">Next: Review &rarr;</button>
+                <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+                <button class="btn btn-primary" onclick="goToStep(4)">Next: Review</button>
               </div>
             </div>
           </div>
@@ -491,12 +491,12 @@
               <div id="terms-error" class="error-msg" style="display:none;">Please check all boxes to continue.</div>
 
               <div class="alert alert-info" style="margin-top:1rem;">
-                &#128161; <strong>What happens next?</strong> After you submit, Heidi &amp; Will will review your request and contact you within 24 hours to confirm your booking and arrange the deposit.
+                 <strong>What happens next?</strong>After you submit, Heidi &amp; Will will review your request and contact you within 24 hours to confirm your booking and arrange the deposit.
               </div>
 
               <div class="panel-footer">
-                <button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
-                <button class="btn btn-coral btn-lg" onclick="proceedToSign()">&#9997;&#65039; Review &amp; Sign Agreement &rarr;</button>
+                <button class="btn btn-secondary" onclick="goToStep(3)">Back</button>
+                <button class="btn btn-coral btn-lg" onclick="proceedToSign()">Review &amp; Sign Agreement</button>
               </div>
             </div>
           </div>
@@ -514,18 +514,18 @@
                 <iframe id="sign-embed" title="Rental agreement e-signature" style="width:100%; height:100%; border:0;" allow="camera; microphone; clipboard-write"></iframe>
               </div>
 
-              <div id="sign-done" class="alert alert-success" style="display:none;">&#10003;&nbsp; <strong>Agreement signed.</strong> Thanks! Submit your request below to finish.</div>
+              <div id="sign-done" class="alert alert-success" style="display:none;"><strong>Agreement signed.</strong>Thanks! Submit your request below to finish.</div>
 
               <!-- Fallback shown when e-signature isn't set up yet (or can't load) -->
               <div id="sign-fallback" style="display:none;">
                 <div class="alert alert-warning">
-                  &#9997;&#65039; <strong>We'll email your rental agreement to sign.</strong> After you submit, Heidi &amp; Will will send the full rental agreement to your email for electronic signature before pickup. Nothing to print.
+                   <strong>We'll email your rental agreement to sign.</strong>After you submit, Heidi &amp; Will will send the full rental agreement to your email for electronic signature before pickup. Nothing to print.
                 </div>
               </div>
 
               <div class="panel-footer">
-                <button class="btn btn-secondary" onclick="goToStep(4)">&larr; Back</button>
-                <button class="btn btn-coral btn-lg" id="finishBtn" onclick="submitBooking()">&#128203; Submit Booking Request</button>
+                <button class="btn btn-secondary" onclick="goToStep(4)">Back</button>
+                <button class="btn btn-coral btn-lg" id="finishBtn" onclick="submitBooking()">Submit Booking Request</button>
               </div>
             </div>
           </div>
@@ -534,7 +534,7 @@
           <div class="booking-panel" id="step6">
             <div class="booking-card">
               <div class="confirmation-banner">
-                <div class="confirmation-check">&#10003;</div>
+                <div class="confirmation-check"></div>
                 <h3 style="margin-bottom:0.5rem;">Booking Request Submitted!</h3>
                 <p style="color:var(--gray); margin-bottom:1rem;">We've received your request and will be in touch within 24 hours to confirm and arrange your deposit.</p>
                 <div class="confirmation-id" id="confirmationId">CWR-000000</div>
@@ -548,7 +548,7 @@
               <div id="paySection"></div>
 
               <div class="alert alert-info" style="margin-top:2rem;">
-                <strong>&#128140; Check your email!</strong> Our team will reach out to <span id="confirmEmail"></span> to finalize your booking.
+                <strong>Check your email!</strong>Our team will reach out to <span id="confirmEmail"></span> to finalize your booking.
               </div>
               <div style="background:var(--cream); border-radius:var(--radius); padding:1.25rem; margin-top:1rem;">
                 <h4 style="font-size:1rem; margin-bottom:0.75rem;">Next Steps</h4>
@@ -589,19 +589,19 @@
 
           <div class="trust-badges">
             <div class="trust-badge">
-              <span class="icon">&#128274;</span>
+              <span class="icon"></span>
               <span>Secure booking, your info is safe</span>
             </div>
             <div class="trust-badge">
-              <span class="icon">&#128222;</span>
+              <span class="icon"></span>
               <span>Questions? Call <a href="tel:9203201270">(920) 320-1270</a></span>
             </div>
             <div class="trust-badge">
-              <span class="icon">&#128140;</span>
+              <span class="icon"></span>
               <span>Or email <a href="mailto:ColorWagonRentals@gmail.com">ColorWagonRentals@gmail.com</a></span>
             </div>
             <div class="trust-badge">
-              <span class="icon">&#127775;</span>
+              <span class="icon"></span>
               <span>Family-run business in Manitowoc, WI</span>
             </div>
           </div>
@@ -624,8 +624,8 @@
           </a>
           <p>Hand-painted camper vans for unforgettable Wisconsin adventures. Est. 2026.</p>
           <div class="social-links">
-            <a href="#" class="social-link" aria-label="Facebook">&#128216;</a>
-            <a href="mailto:ColorWagonRentals@gmail.com" class="social-link" aria-label="Email">&#128140;</a>
+            <a href="#" class="social-link" aria-label="Facebook"></a>
+            <a href="mailto:ColorWagonRentals@gmail.com" class="social-link" aria-label="Email"></a>
           </div>
         </div>
         <div class="footer-col">

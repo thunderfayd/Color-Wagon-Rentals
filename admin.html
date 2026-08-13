@@ -52,6 +52,10 @@
     .chk { border: 1px solid var(--cream-dark); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 0.85rem; }
     .chk .chk-top { display: flex; align-items: center; gap: 0.6rem; justify-content: space-between; }
     .chk .chk-title { font-weight: 800; display: flex; align-items: center; gap: 0.55rem; }
+    .chk-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; display: inline-block; }
+    .chk-dot-done { background: #2F6B3F; }
+    .chk-dot-todo { background: var(--cream-dark); }
+    .chk-dot-action { background: var(--gertrude); }
     .chk-badge { font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px; white-space: nowrap; }
     .chk-done { background: #DCFCE7; color: #15803D; }
     .chk-todo { background: #FEF3C7; color: #92400E; }
@@ -69,7 +73,7 @@
 
     <!-- Login -->
     <div id="loginView" class="admin-card login-box">
-      <h2>&#128274; Dashboard Login</h2>
+      <h2>Dashboard Login</h2>
       <p class="muted" style="margin-bottom:1rem;">Enter the dashboard password to manage bookings.</p>
       <div class="form-group">
         <label for="pw">Password</label>
@@ -87,15 +91,15 @@
           <div class="muted">Color Wagon Rentals · changes go live on the site instantly</div>
         </div>
         <div style="display:flex; gap:0.5rem;">
-          <button class="btn btn-secondary btn-sm" onclick="refresh()">&#8635; Refresh</button>
+          <button class="btn btn-secondary btn-sm" onclick="refresh()">Refresh</button>
           <button class="btn btn-secondary btn-sm" onclick="logout()">Log out</button>
         </div>
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" id="tab-bookings" onclick="showView('bookings')">&#128197; Bookings</button>
-        <button class="tab-btn" id="tab-analytics" onclick="showView('analytics')">&#128202; Analytics</button>
-        <button class="tab-btn" id="tab-checklist" onclick="showView('checklist')">&#9989; Launch Checklist <span class="pill" id="chkPill" style="display:none;">0</span></button>
+        <button class="tab-btn active" id="tab-bookings" onclick="showView('bookings')">Bookings</button>
+        <button class="tab-btn" id="tab-analytics" onclick="showView('analytics')">Analytics</button>
+        <button class="tab-btn" id="tab-checklist" onclick="showView('checklist')">Launch Checklist <span class="pill" id="chkPill" style="display:none;">0</span></button>
       </div>
 
       <div id="banner"></div>
@@ -103,17 +107,17 @@
       <!-- ===== BOOKINGS VIEW ===== -->
       <div class="view active" id="view-bookings">
         <div class="admin-card">
-          <h2>&#128236; New Requests <span class="pill" id="reqCount">0</span></h2>
+          <h2>New Requests <span class="pill" id="reqCount">0</span></h2>
           <div id="requests"><div class="empty">Loading…</div></div>
         </div>
 
         <div class="admin-card">
-          <h2>&#128197; Booked &amp; Blocked Dates <span class="pill" id="confCount">0</span></h2>
+          <h2>Booked &amp; Blocked Dates <span class="pill" id="confCount">0</span></h2>
           <div id="confirmed"><div class="empty">Loading…</div></div>
         </div>
 
         <div class="admin-card">
-          <h2>&#10133; Add a Booking or Block Dates</h2>
+          <h2>Add a Booking or Block Dates</h2>
           <div class="add-grid">
             <div class="form-group" style="margin:0;">
               <label for="addUnit">Camper</label>
@@ -140,23 +144,23 @@
       <!-- ===== ANALYTICS VIEW ===== -->
       <div class="view" id="view-analytics">
         <div class="admin-card">
-          <h2>&#128064; Site Traffic</h2>
+          <h2>Site Traffic</h2>
           <div class="stat-grid" id="trafficStats"></div>
-          <h3 style="font-size:0.95rem; margin:1.35rem 0 0.6rem;">Views &mdash; last 14 days</h3>
+          <h3 style="font-size:0.95rem; margin:1.35rem 0 0.6rem;">Views, last 14 days</h3>
           <div id="trafficDaily"><div class="empty">No visits recorded yet.</div></div>
           <h3 style="font-size:0.95rem; margin:1.35rem 0 0.6rem;">Top pages</h3>
           <div id="trafficPages"><div class="empty">No data yet.</div></div>
         </div>
         <div class="admin-card">
-          <h2>&#128202; Bookings at a Glance</h2>
+          <h2>Bookings at a Glance</h2>
           <div class="stat-grid" id="statGrid"></div>
         </div>
         <div class="admin-card">
-          <h2>&#128663; Bookings by Camper</h2>
+          <h2>Bookings by Camper</h2>
           <div id="unitBars"><div class="empty">No data yet.</div></div>
         </div>
         <div class="admin-card">
-          <h2>&#128197; Upcoming Trips <span class="pill" id="upCount">0</span></h2>
+          <h2>Upcoming Trips <span class="pill" id="upCount">0</span></h2>
           <div id="upcoming"><div class="empty">No upcoming trips.</div></div>
         </div>
         <p class="muted">Revenue figures are estimates from the booking form (before final confirmation, tax rounding, and any extra-mileage charges).</p>
@@ -165,7 +169,7 @@
       <!-- ===== CHECKLIST VIEW ===== -->
       <div class="view" id="view-checklist">
         <div class="admin-card">
-          <h2>&#9989; Launch Checklist</h2>
+          <h2>Launch Checklist</h2>
           <p class="muted" style="margin-bottom:1.25rem;">Everything needed to fully switch the site on. Items with a live status update automatically; the rest are things to confirm or set up with your developer.</p>
           <div id="checklist"><div class="empty">Loading…</div></div>
         </div>
@@ -251,15 +255,15 @@
         <div class="row-item">
           <div class="top">
             <div><span class="who">${esc(r.name)}</span> &nbsp;${unitChip(r.unit)}</div>
-            <div class="muted">${esc(r.start)} → ${esc(r.end)}${r.nights ? ' · ' + esc(r.nights) + ' nights' : ''}</div>
+            <div class="muted">${esc(r.start)}  ${esc(r.end)}${r.nights ? ' · ' + esc(r.nights) + ' nights' : ''}</div>
           </div>
           <div class="meta">
             ${esc(r.email)} · ${esc(r.phone)}${r.estimated_total ? ' · est. ' + money(r.estimated_total) : ''}<br/>
-            ${r.group_size ? 'Group of ' + esc(r.group_size) + ' · ' : ''}${r.license_state ? 'License ' + esc(r.license_state) + ' ' + esc(r.license_number) + ' · ' : ''}Agreement: ${r.signed ? 'signed ✓' : 'not yet'}
+            ${r.group_size ? 'Group of ' + esc(r.group_size) + ' · ' : ''}${r.license_state ? 'License ' + esc(r.license_state) + ' ' + esc(r.license_number) + ' · ' : ''}Agreement: ${r.signed ? 'signed ' : 'not yet'}
             ${r.destination ? '<br/>Trip: ' + esc(r.destination) : ''}${r.special_requests ? '<br/>Notes: ' + esc(r.special_requests) : ''}
           </div>
           <div class="actions">
-            <button class="btn btn-primary btn-sm" onclick="confirmReq('${esc(r.id)}')">&#10003; Confirm &amp; block dates</button>
+            <button class="btn btn-primary btn-sm" onclick="confirmReq('${esc(r.id)}')">Confirm &amp; block dates</button>
             <button class="btn btn-secondary btn-sm" onclick="declineReq('${esc(r.id)}')">Decline</button>
           </div>
         </div>`).join('');
@@ -272,7 +276,7 @@
         <div class="row-item">
           <div class="top">
             <div>${unitChip(b.unit)} &nbsp;<span class="who">${esc(b.name || 'Booked')}</span></div>
-            <div class="muted">${esc(b.start)} → ${esc(b.end)}</div>
+            <div class="muted">${esc(b.start)}  ${esc(b.end)}</div>
           </div>
           <div class="actions">
             <button class="btn btn-secondary btn-sm" onclick="delBooking('${esc(b.id)}')">Remove</button>
@@ -374,7 +378,7 @@
         <div class="row-item">
           <div class="top">
             <div>${unitChip(b.unit)} &nbsp;<span class="who">${esc(b.name || 'Booked')}</span></div>
-            <div class="muted">${esc(b.start)} → ${esc(b.end)} · ${daysBetween(b.start, b.end)} nights</div>
+            <div class="muted">${esc(b.start)}  ${esc(b.end)} · ${daysBetween(b.start, b.end)} nights</div>
           </div>
         </div>`).join('') : '<div class="empty">No upcoming trips.</div>';
     }
@@ -391,20 +395,20 @@
             : 'DNS is pointed at Netlify. Once the SSL certificate finishes, open the site + this dashboard at <code>https://www.colorwagonrentals.com/admin.html</code>.' },
         { title: 'Dashboard password', status: 'done',
           body: 'You are logged in, so <code>ADMIN_PASSWORD</code> is set. To change it, update the variable in Netlify and redeploy.' },
-        { title: 'E-signature &mdash; rental agreement (SignWell)', status: CONFIG.signwell ? 'done' : 'todo',
+        { title: 'E-signature: rental agreement (SignWell)', status: CONFIG.signwell ? 'done' : 'todo',
           body: CONFIG.signwell
-            ? ('Connected' + (CONFIG.signwell_test ? ' <strong>(TEST MODE)</strong> &mdash; remove <code>SIGNWELL_TEST_MODE</code> to go live.' : '. Renters sign the agreement inside the booking flow.'))
+            ? ('Connected' + (CONFIG.signwell_test ? ' <strong>(TEST MODE)</strong> . Remove <code>SIGNWELL_TEST_MODE</code> to go live.' : '. Renters sign the agreement inside the booking flow.'))
             : '<ol>' +
                 '<li>Create a <strong>SignWell</strong> account.</li>' +
                 '<li>Build a reusable <strong>Template</strong> of your rental agreement with all <strong>12 signature fields</strong> placed across the pages, assigned to "the renter".</li>' +
-                '<li>Copy your <strong>API Key</strong> (Settings → API) and the <strong>Template ID</strong>.</li>' +
-                '<li>In Netlify → Site configuration → Environment variables, add <code>SIGNWELL_API_KEY</code> and <code>SIGNWELL_TEMPLATE_ID</code> (add <code>SIGNWELL_TEST_MODE=true</code> while testing).</li>' +
+                '<li>Copy your <strong>API Key</strong> (Settings  API) and the <strong>Template ID</strong>.</li>' +
+                '<li>In Netlify  Site configuration  Environment variables, add <code>SIGNWELL_API_KEY</code> and <code>SIGNWELL_TEMPLATE_ID</code> (add <code>SIGNWELL_TEST_MODE=true</code> while testing).</li>' +
                 '<li>Trigger a deploy. The booking flow then embeds the live agreement automatically.</li>' +
               '</ol>' +
-              'Until then, the booking page tells renters the agreement will be emailed to them &mdash; so bookings still work.' },
+              'Until then, the booking page tells renters the agreement will be emailed to them, so bookings still work.' },
         { title: 'Payment / deposit collection', status: CONFIG.payment ? 'done' : 'todo',
           body: CONFIG.payment
-            ? ('Connected' + (CONFIG.payment_link ? ' &mdash; deposit link: <code>' + esc(CONFIG.payment_link) + '</code>' : '.'))
+            ? ('Connected' + (CONFIG.payment_link ? ' (deposit link: <code>' + esc(CONFIG.payment_link) + '</code>)' : '.'))
             : '<ol>' +
                 '<li>Recommended: <strong>Stripe</strong>. Create an account and decide your <strong>deposit amount</strong> + refund policy (bring this to the meeting with Heidi).</li>' +
                 '<li>Simplest path: create a Stripe <strong>Payment Link</strong> for the deposit, then add it in Netlify as <code>PAYMENT_LINK_URL</code> so it appears on the booking confirmation.</li>' +
@@ -414,7 +418,7 @@
         { title: 'Confirm Wisconsin sales-tax rate', status: 'action',
           body: 'The site currently adds <strong>5.5%</strong> (WI state 5% + Manitowoc County 0.5%) on top of the rental + $50 cleaning fee. Confirm this is correct for your situation; tell your developer if it should change.' },
         { title: 'Set www as the primary domain (optional)', status: onDomain ? 'done' : 'action',
-          body: 'The site\'s links use the <code>www.</code> version. In Netlify → Domain management, set <code>www.colorwagonrentals.com</code> as the primary domain so everything matches.' }
+          body: 'The site\'s links use the <code>www.</code> version. In Netlify  Domain management, set <code>www.colorwagonrentals.com</code> as the primary domain so everything matches.' }
       ];
 
       const badge = { done: ['chk-done', 'Done'], todo: ['chk-todo', 'To do'], action: ['chk-action', 'Confirm'] };
@@ -424,10 +428,10 @@
 
       $('checklist').innerHTML = steps.map((s) => {
         const [cls, label] = badge[s.status];
-        const icon = s.status === 'done' ? '✅' : (s.status === 'todo' ? '⬜' : '🔎');
+        const dot = 'chk-dot chk-dot-' + s.status;
         return `<div class="chk">
           <div class="chk-top">
-            <div class="chk-title">${icon} <span>${s.title}</span></div>
+            <div class="chk-title"><span class="${dot}"></span> <span>${s.title}</span></div>
             <span class="chk-badge ${cls}">${label}</span>
           </div>
           <div class="chk-body">${s.body}</div>

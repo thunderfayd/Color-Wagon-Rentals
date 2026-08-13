@@ -1,4 +1,4 @@
-// Records a single pageview into Blobs. No cookies, no IPs, no PII —
+// Records a single pageview into Blobs. No cookies, no IPs, no PII,
 // just aggregate counts so the admin dashboard can show site traffic.
 const { getStore, connectLambda } = require('@netlify/blobs');
 
@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     if (dayKeys.length > 120) dayKeys.slice(0, dayKeys.length - 120).forEach((k) => delete t.days[k]);
 
     await store.setJSON('traffic', t);
-  } catch (e) { /* best-effort — never fail the page */ }
+  } catch (e) { /* best-effort, never fail the page */ }
 
   return { statusCode: 204, headers: { 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*' }, body: '' };
 };
