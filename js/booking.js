@@ -48,7 +48,7 @@ const state = {
   nights: 0,
   firstName: '', lastName: '', email: '', phone: '',
   address: '', dob: '', licenseNum: '', licenseState: '',
-  groupSize: '', destination: '', specialRequests: '', signed: false
+  groupSize: '', destination: '', specialRequests: ''
 };
 
 // ---- Bookings: live availability (Netlify) with static fallback + this browser's pending requests ----
@@ -536,7 +536,10 @@ function buildReviewSummary() {
     </div>`;
 }
 
-// ---- Step 4  validate agreement checkboxes, then move to e-signature ----
+// ---- Step 4  validate the agreement checkboxes, then move to the last step ----
+// There is deliberately no e-signature on this site. Heidi handles the rental
+// agreement with the renter directly, so step 5 explains that and offers her
+// phone and email rather than embedding a signing session.
 function proceedToSign() {
   const agree = document.getElementById('agreeTerms');
   const ageCheck = document.getElementById('agreeAge');
@@ -548,56 +551,7 @@ function proceedToSign() {
   }
   if (termsErr) termsErr.style.display = 'none';
   goToStep(5);
-  initSignature();
 }
-
-// ---- Rental agreement e-signature (SignWell, embedded) ----
-// Asks the Netlify function for an embedded signing session for this renter.
-// If SignWell isn't configured yet, we fall back to "we'll email it to you".
-let signatureRequested = false;
-async function initSignature() {
-  if (signatureRequested) return;
-  signatureRequested = true;
-  const loading = document.getElementById('sign-loading');
-  const wrap = document.getElementById('sign-embed-wrap');
-  const frame = document.getElementById('sign-embed');
-  const fallback = document.getElementById('sign-fallback');
-  if (loading) loading.style.display = 'block';
-  try {
-    const res = await fetch('/api/create-signature', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: (state.firstName + ' ' + state.lastName).trim(),
-        email: state.email,
-        camper: (UNITS[state.vehicle] || {}).name || state.vehicle,
-        pickup_date: state.pickupDate ? state.pickupDate.toISOString().split('T')[0] : '',
-        return_date: state.returnDate ? state.returnDate.toISOString().split('T')[0] : ''
-      })
-    });
-    const data = res.ok ? await res.json() : {};
-    if (data && data.embedded_url) {
-      if (frame) frame.src = data.embedded_url;
-      if (wrap) wrap.style.display = 'block';
-      if (loading) loading.style.display = 'none';
-      return;
-    }
-  } catch (e) { /* not configured / offline - show the email fallback below */ }
-  if (loading) loading.style.display = 'none';
-  if (fallback) fallback.style.display = 'block';
-}
-
-// SignWell posts a message to the page when the signer finishes.
-window.addEventListener('message', (e) => {
-  let s = '';
-  try { s = (typeof e.data === 'string' ? e.data : JSON.stringify(e.data || '')).toLowerCase(); } catch (_) { s = ''; }
-  if (!s) return;
-  if (s.includes('signwell') && (s.includes('complete') || s.includes('signed') || s.includes('finish'))) {
-    state.signed = true;
-    const done = document.getElementById('sign-done');
-    if (done) done.style.display = 'block';
-  }
-});
 
 // ---- Submit Booking ----
 function submitBooking() {
@@ -641,7 +595,7 @@ function submitBooking() {
     group_size: state.groupSize,
     destination: state.destination,
     special_requests: state.specialRequests,
-    agreement_signed: state.signed ? 'yes' : 'emailed after booking'
+    agreement_signed: 'handled directly by Heidi'
   });
   fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload.toString() })
     .catch(() => { /* offline / local preview - request is still saved locally */ });
@@ -659,7 +613,7 @@ function submitBooking() {
       group_size: state.groupSize, nights: state.nights,
       estimated_total: u.priced ? priceBreakdown(state.nights).total : null,
       destination: state.destination, special_requests: state.specialRequests,
-      signed: state.signed, submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString()
     })
   }).catch(() => { /* not deployed yet - request still delivered via Netlify Forms */ });
 
@@ -680,9 +634,7 @@ function submitBooking() {
       card('Pickup Date', formatDate(state.pickupDate)) +
       card('Return Date', formatDate(state.returnDate)) +
       card('Duration', state.nights + ' night' + (state.nights > 1 ? 's' : '')) +
-      card('Rental Agreement', state.signed
-        ? '<span style="color:var(--green-dark);">Signed</span>'
-        : '<span style="color:var(--gertrude);">Sent to your email</span>') +
+      card('Rental Agreement', '<span style="color:var(--gertrude);">Heidi will go through it with you</span>') +
       card('Booking Status', '<span style="color:var(--gertrude);">Pending Confirmation</span>');
   }
 

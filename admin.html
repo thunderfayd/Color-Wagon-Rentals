@@ -395,17 +395,6 @@
             : 'DNS is pointed at Netlify. Once the SSL certificate finishes, open the site + this dashboard at <code>https://www.colorwagonrentals.com/admin.html</code>.' },
         { title: 'Dashboard password', status: 'done',
           body: 'You are logged in, so <code>ADMIN_PASSWORD</code> is set. To change it, update the variable in Netlify and redeploy.' },
-        { title: 'E-signature: rental agreement (SignWell)', status: CONFIG.signwell ? 'done' : 'todo',
-          body: CONFIG.signwell
-            ? ('Connected' + (CONFIG.signwell_test ? ' <strong>(TEST MODE)</strong> . Remove <code>SIGNWELL_TEST_MODE</code> to go live.' : '. Renters sign the agreement inside the booking flow.'))
-            : '<ol>' +
-                '<li>Create a <strong>SignWell</strong> account.</li>' +
-                '<li>Build a reusable <strong>Template</strong> of your rental agreement with all <strong>12 signature fields</strong> placed across the pages, assigned to "the renter".</li>' +
-                '<li>Copy your <strong>API Key</strong> (Settings  API) and the <strong>Template ID</strong>.</li>' +
-                '<li>In Netlify  Site configuration  Environment variables, add <code>SIGNWELL_API_KEY</code> and <code>SIGNWELL_TEMPLATE_ID</code> (add <code>SIGNWELL_TEST_MODE=true</code> while testing).</li>' +
-                '<li>Trigger a deploy. The booking flow then embeds the live agreement automatically.</li>' +
-              '</ol>' +
-              'Until then, the booking page tells renters the agreement will be emailed to them, so bookings still work.' },
         { title: 'Payment / deposit collection', status: CONFIG.payment ? 'done' : 'todo',
           body: CONFIG.payment
             ? ('Connected' + (CONFIG.payment_link ? ' (deposit link: <code>' + esc(CONFIG.payment_link) + '</code>)' : '.'))

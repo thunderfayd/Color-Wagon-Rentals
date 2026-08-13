@@ -23,6 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/tour.css" />
 </head>
 <body>
   <a class="skip-link" href="#gertrude">Skip to content</a>
@@ -67,6 +68,7 @@
   <!-- Fleet Nav Pills -->
   <div style="background:var(--cream); border-bottom:1px solid var(--cream-dark); position:sticky; top:var(--nav-height); z-index:100;">
     <div class="container" style="display:flex; gap:1rem; padding-top:1rem; padding-bottom:1rem; overflow-x:auto;">
+      <a href="#tour" class="btn btn-sm btn-secondary">Take the Tour</a>
       <a href="#gertrude" class="btn btn-sm btn-secondary">Gertrude</a>
       <a href="#violet" class="btn btn-sm btn-secondary">Violet</a>
       <a href="#trailer" class="btn btn-sm btn-secondary">The Trailer</a>
@@ -76,6 +78,36 @@
 
   <div class="container">
 
+    <!-- Interior tour: drag to look around, tap the numbers -->
+    <div class="unit-detail" id="tour" style="display:block; margin-bottom:3rem;">
+      <div style="text-align:center; max-width:640px; margin:0 auto 1.5rem;">
+        <span class="section-label">Have a look inside</span>
+        <h2 style="margin:0.4rem 0 0.6rem;">Take the Tour</h2>
+        <p style="color:var(--gray);">Drag to look around the camper, then tap a number to see what you are looking at.</p>
+      </div>
+
+      <div class="tour" data-tour aria-label="Interior tour of the camper. Drag to pan, or use the left and right arrow keys.">
+        <div class="tour-viewport">
+          <div class="tour-plane">
+            <picture>
+              <source srcset="colorwagonrentals/tour/van-interior-4200.webp" media="(min-width: 900px)" type="image/webp">
+              <source srcset="colorwagonrentals/tour/van-interior-2100.webp" type="image/webp">
+              <img src="colorwagonrentals/tour/van-interior.jpg"
+                   alt="Panoramic view inside a Color Wagon camper: rear kitchen, blackout privacy curtains, a made-up queen bed, the driver's cab and the open side door"
+                   width="4200" height="935" decoding="async">
+            </picture>
+          </div>
+          <div class="tour-hint">Drag to look around</div>
+          <div class="tour-caption" role="status" aria-live="polite">
+            <button class="tour-caption-close" type="button" aria-label="Close">&times;</button>
+            <h4></h4>
+            <p></p>
+          </div>
+          <div class="tour-rail"><span></span></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Gertrude -->
     <div class="unit-detail theme-gertrude" id="gertrude">
       <div class="unit-gallery">
@@ -83,7 +115,7 @@
           <img src="colorwagonrentals/gertrude/IMG_0882.webp" alt="Gertrude, the autumn-painted 2008 Ford Econoline camper van, full side profile" width="1100" height="825" loading="lazy" decoding="async" style="object-position: center;" />
         </div>
         <div class="unit-gallery-thumbs">
-          <img src="colorwagonrentals/CW Bed.webp" alt="Gertrude's queen-size bed with wildflower bedding" width="1086" height="1448" loading="lazy" decoding="async" />
+          <img src="colorwagonrentals/CW Bed.webp" alt="The bench folded out into a made-up queen bed inside a Color Wagon camper" width="1086" height="1448" loading="lazy" decoding="async" />
           <img src="colorwagonrentals/gertrude/IMG_1853.webp" alt="Gertrude parked at the marina at sunset" width="1100" height="1467" loading="lazy" decoding="async" />
         </div>
       </div>
@@ -130,20 +162,20 @@
           <img src="colorwagonrentals/violet/violet-side.webp" alt="Violet, the purple pond-mural 2013 Ford Econoline camper van, side profile" width="1100" height="620" loading="lazy" decoding="async" />
         </div>
         <div class="unit-gallery-thumbs">
-          <img src="colorwagonrentals/CW Bed.webp" alt="Violet's fold-out queen bed with wildflower bedding" width="1086" height="1448" loading="lazy" decoding="async" />
-          <div class="thumb-fill" style="background:linear-gradient(135deg,#5B21B6,#8B5CF6); flex-direction:column; gap:0.25rem; font-size:2rem;"><span style="font-size:0.72rem; font-weight:800; letter-spacing:0.02em;">Rear Kitchen</span></div>
+          <img src="colorwagonrentals/CW Bed.webp" alt="The bench folded out into a made-up queen bed inside a Color Wagon camper" width="1086" height="1448" loading="lazy" decoding="async" />
+          <img src="colorwagonrentals/kitchen.webp" alt="The rear-access kitchen: stainless prep counter, sink with faucet, pull-out propane stove, cutlery and storage, reached through the open back doors" width="1100" height="825" loading="lazy" decoding="async" />
         </div>
       </div>
       <div class="unit-info">
         <div class="unit-info-header">
           <span class="unit-kicker">The showstopper...</span>
           <div class="unit-name">Violet</div>
-          <div class="unit-tagline">2013 Ford Econoline &middot; Bright, Bold &amp; Solar-Powered</div>
-          <p>Violet's purple pond-life mural, frogs and all, is impossible to miss in any parking lot. She's the newer of the two vans, with solar power on board and a CD player for the full retro road-trip experience. Dig out your old album binder; you know you still have it.</p>
+          <div class="unit-tagline">2013 Ford Econoline &middot; Bright, Bold &amp; Frog-Covered</div>
+          <p>Violet's purple pond-life mural, frogs and all, is impossible to miss in any parking lot. She's the newer of the two vans, with a solar panel that keeps the fridge running and a CD player for the full retro road-trip experience. Dig out your old album binder; you know you still have it.</p>
         </div>
         <div class="unit-features">
           <div class="unit-feature"><div class="feature-check"></div>Sleeps 2 on a queen bed</div>
-          <div class="unit-feature"><div class="feature-check"></div>Solar power on board</div>
+          <div class="unit-feature"><div class="feature-check"></div>Solar power for the fridge</div>
           <div class="unit-feature"><div class="feature-check"></div>CD player</div>
           <div class="unit-feature"><div class="feature-check"></div>Rear-access kitchen</div>
           <div class="unit-feature"><div class="feature-check"></div>Pull-out propane stove</div>
@@ -331,5 +363,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="js/tour.js"></script>
 </body>
 </html>

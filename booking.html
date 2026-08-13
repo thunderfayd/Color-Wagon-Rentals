@@ -241,7 +241,7 @@
               <span class="step-label" id="lbl2">Dates</span>
               <span class="step-label" id="lbl3">Your Info</span>
               <span class="step-label" id="lbl4">Review</span>
-              <span class="step-label" id="lbl5">Sign</span>
+              <span class="step-label" id="lbl5">Finish</span>
               <span class="step-label" id="lbl6">Confirmed!</span>
             </div>
           </div>
@@ -496,7 +496,7 @@
 
               <div class="panel-footer">
                 <button class="btn btn-secondary" onclick="goToStep(3)">Back</button>
-                <button class="btn btn-coral btn-lg" onclick="proceedToSign()">Review &amp; Sign Agreement</button>
+                <button class="btn btn-coral btn-lg" onclick="proceedToSign()">Continue</button>
               </div>
             </div>
           </div>
@@ -504,23 +504,17 @@
           <!-- STEP 5: Sign Rental Agreement -->
           <div class="booking-panel" id="step5">
             <div class="booking-card">
-              <h3>Sign Your Rental Agreement</h3>
-              <p style="color:var(--gray); margin-bottom:1rem;">Review and electronically sign the Color Wagon Rentals rental agreement below. The agreement runs several pages, so follow the guided prompts to sign each spot, then submit your request.</p>
+              <h3>The Rental Agreement</h3>
+              <p style="color:var(--gray); margin-bottom:1rem;">You do not sign anything on this website. Heidi handles the rental agreement with you directly, so the last step here is simply sending your request.</p>
 
-              <div id="sign-loading" class="alert alert-info" style="display:none;">&#8987;&nbsp; Preparing your rental agreement&hellip;</div>
-
-              <!-- Embedded SignWell agreement (shown when e-signature is configured) -->
-              <div id="sign-embed-wrap" style="display:none; border:1px solid var(--cream-dark); border-radius:var(--radius); overflow:hidden; height:70vh; min-height:520px;">
-                <iframe id="sign-embed" title="Rental agreement e-signature" style="width:100%; height:100%; border:0;" allow="camera; microphone; clipboard-write"></iframe>
+              <div class="alert alert-info">
+                <strong>How it works.</strong>Submit your request below and Heidi will call or email you within 24 hours to confirm your dates. She will go through the rental agreement with you and get it signed before you pick the camper up. Nothing to print, and nothing to sign online.
               </div>
 
-              <div id="sign-done" class="alert alert-success" style="display:none;"><strong>Agreement signed.</strong>Thanks! Submit your request below to finish.</div>
-
-              <!-- Fallback shown when e-signature isn't set up yet (or can't load) -->
-              <div id="sign-fallback" style="display:none;">
-                <div class="alert alert-warning">
-                   <strong>We'll email your rental agreement to sign.</strong>After you submit, Heidi &amp; Will will send the full rental agreement to your email for electronic signature before pickup. Nothing to print.
-                </div>
+              <div class="alert alert-warning">
+                <strong>Questions before you send it?</strong>Talk to Heidi first, that is always fine.
+                <a href="tel:9203201270" style="font-weight:700;">(920) 320-1270</a>
+                or <a href="mailto:ColorWagonRentals@gmail.com" style="font-weight:700;">ColorWagonRentals@gmail.com</a>
               </div>
 
               <div class="panel-footer">
@@ -555,7 +549,7 @@
                 <div class="req-list">
                   <div class="req-item"><div class="req-icon">1</div>Heidi &amp; Will will call or email within 24 hours</div>
                   <div class="req-item"><div class="req-icon">2</div>You'll confirm dates and arrange the deposit</div>
-                  <div class="req-item"><div class="req-icon">3</div>Sign the rental agreement and pay the balance 7 days before your trip</div>
+                  <div class="req-item"><div class="req-icon">3</div>Heidi goes through the rental agreement with you before pickup</div>
                   <div class="req-item"><div class="req-icon">4</div>Pick up your camper in Manitowoc on your start date</div>
                   <div class="req-item"><div class="req-icon">5</div>Hit the road and adventure!</div>
                 </div>

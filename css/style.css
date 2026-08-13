@@ -312,16 +312,27 @@ h4 { font-size: 1.1rem; }
   object-fit: cover;
   object-position: center 60%;
 }
+/* Scrim over the hero photo. The middle band used to drop to 0.28, which is
+   exactly where the headline and paragraph sit, so white text landing on the
+   white van or bright sky measured 1:1 against the backdrop. Holding the
+   middle darker keeps the photo readable and the copy legible. */
 .hero-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(14, 61, 35, 0.55) 0%,
-    rgba(14, 61, 35, 0.28) 45%,
-    rgba(14, 61, 35, 0.72) 100%
+    rgba(14, 61, 35, 0.62) 0%,
+    rgba(14, 61, 35, 0.52) 45%,
+    rgba(14, 61, 35, 0.78) 100%
   );
+}
+/* Second line of defence so a bright patch behind a single line cannot
+   swallow it, without muddying the type the way a heavy shadow would. */
+.hero-content h1,
+.hero-content .hero-tagline,
+.hero-content > p {
+  text-shadow: 0 1px 12px rgba(9, 34, 20, 0.55);
 }
 .hero .container { position: relative; z-index: 2; }
 .hero-content { max-width: 660px; padding: 7rem 0 5rem; }

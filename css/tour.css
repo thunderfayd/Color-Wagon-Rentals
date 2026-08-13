@@ -1,0 +1,163 @@
+/* =============================================
+   Color Wagon - Point and click interior tour
+   A wide interior sweep you drag to pan, with labelled hotspots.
+   Deliberately no 360 library: the photos are iPhone sweep panoramas
+   (16352x3698, about 4.4:1), not equirectangular spheres, so a sphere
+   viewer would distort them. This is self-contained and needs no reshoot.
+   ============================================= */
+
+.tour {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #1b211d;
+  box-shadow: var(--shadow-md);
+  touch-action: pan-y;          /* let the page scroll vertically, we take horizontal */
+  cursor: grab;
+  user-select: none;
+}
+.tour.is-dragging { cursor: grabbing; }
+
+.tour-viewport {
+  position: relative;
+  overflow: hidden;
+  height: clamp(260px, 46vw, 520px);
+}
+
+/* The image is wider than the frame; we translate it on the X axis. */
+.tour-plane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  will-change: transform;
+}
+.tour-plane img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  pointer-events: none;
+}
+
+/* ---- hotspots ---- */
+.tour-spot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(30, 122, 70, 0.92);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.tour-spot:hover,
+.tour-spot:focus-visible {
+  background: var(--gold, #E8A33D);
+  color: #1b211d;
+  transform: translate(-50%, -50%) scale(1.14);
+  outline: none;
+}
+.tour-spot.is-active {
+  background: var(--gold, #E8A33D);
+  color: #1b211d;
+}
+/* gentle pulse so people realise the dots are pressable */
+.tour-spot::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  animation: tour-pulse 2.4s ease-out infinite;
+}
+.tour-spot.is-active::before,
+.tour-spot:hover::before { animation: none; opacity: 0; }
+@keyframes tour-pulse {
+  0%   { transform: scale(0.75); opacity: 0.9; }
+  70%  { transform: scale(1.25); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ---- caption ---- */
+.tour-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem 1.15rem 1.1rem;
+  background: linear-gradient(to top, rgba(12, 30, 20, 0.94) 60%, rgba(12, 30, 20, 0));
+  color: #FFF9EF;
+  transform: translateY(100%);
+  transition: transform 0.22s ease;
+}
+.tour-caption.is-open { transform: translateY(0); }
+.tour-caption h4 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin: 0 0 0.25rem;
+  color: #FFF9EF;
+}
+.tour-caption p { margin: 0; font-size: 0.88rem; line-height: 1.5; color: rgba(255, 249, 239, 0.9); }
+.tour-caption-close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.7rem;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 249, 239, 0.4);
+  background: rgba(0, 0, 0, 0.25);
+  color: #FFF9EF;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---- hint + progress ---- */
+.tour-hint {
+  position: absolute;
+  top: 0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 30, 20, 0.7);
+  color: #FFF9EF;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.tour.has-moved .tour-hint { opacity: 0; }
+
+.tour-rail {
+  position: absolute;
+  left: 1rem; right: 1rem; bottom: 0.6rem;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 249, 239, 0.28);
+  pointer-events: none;
+}
+.tour-rail span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--gold, #E8A33D);
+  width: 30%;
+}
+.tour-caption.is-open ~ .tour-rail { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot::before { animation: none; }
+  .tour-caption, .tour-spot { transition: none; }
+}
