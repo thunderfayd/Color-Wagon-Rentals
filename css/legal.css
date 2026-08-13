@@ -1,0 +1,98 @@
+/* =============================================
+   Legal pages (privacy policy)
+   Long-form reading, so the column is narrow, the type is a touch bigger
+   than body copy, and headings get real air above them.
+   ============================================= */
+
+.legal {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3.5rem 0 4.5rem;
+}
+
+.legal p,
+.legal li {
+  font-size: 1.02rem;
+  line-height: 1.75;
+  color: #3C4A42;
+}
+.legal p { margin-bottom: 1.1rem; }
+
+.legal h2 {
+  font-size: 1.55rem;
+  margin: 2.8rem 0 0.9rem;
+  padding-top: 1.6rem;
+  border-top: 2px solid var(--cream-dark);
+}
+.legal h3 {
+  font-size: 1.12rem;
+  margin: 1.8rem 0 0.6rem;
+  color: var(--green-dark);
+}
+.legal ul {
+  margin: 0 0 1.4rem;
+  padding-left: 0;
+}
+.legal li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.65rem;
+}
+.legal li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-light);
+}
+.legal strong { color: var(--ink); }
+.legal a { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+.legal-meta {
+  font-size: 0.88rem !important;
+  color: var(--gray) !important;
+  font-weight: 600;
+  margin-bottom: 2rem !important;
+}
+
+/* The plain-English box at the top, for people who will not read the rest. */
+.legal-summary {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border-left: 6px solid var(--stripe-gold);
+  padding: 1.8rem 2rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+}
+.legal-summary h2 {
+  margin: 0 0 0.9rem;
+  padding-top: 0;
+  border-top: none;
+  font-size: 1.3rem;
+}
+.legal-summary ul { margin-bottom: 0; }
+
+.legal-contact {
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  margin: 1.4rem 0 0;
+}
+.legal-contact p { margin-bottom: 0; line-height: 1.9; }
+
+.legal-note {
+  margin-top: 2.6rem !important;
+  padding-top: 1.4rem;
+  border-top: 2px solid var(--cream-dark);
+  font-size: 0.94rem !important;
+  color: var(--gray) !important;
+}
+
+@media (max-width: 640px) {
+  .legal { padding: 2.2rem 0 3rem; }
+  .legal h2 { font-size: 1.35rem; margin-top: 2.2rem; }
+  .legal-summary { padding: 1.4rem 1.3rem 1.1rem; }
+}

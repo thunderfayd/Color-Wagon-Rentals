@@ -941,6 +941,7 @@ h4 { font-size: 1.1rem; }
   font-size: 1.3rem;
   flex-shrink: 0;
 }
+.contact-icon svg { width: 23px; height: 23px; color: var(--green); }
 .contact-item h4 { margin-bottom: 0.1rem; }
 .contact-item a, .contact-item p { font-size: 0.95rem; font-weight: 600; }
 .contact-form {
@@ -1011,7 +1012,10 @@ footer {
   font-size: 1.1rem;
   transition: background 0.15s ease;
 }
+.social-link svg { width: 19px; height: 19px; color: var(--cream); }
 .social-link:hover { background: rgba(255, 249, 239, 0.25); }
+.social-link:hover svg { color: var(--white); }
+.social-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .footer-col h5 {
   font-family: var(--font-display);
   color: var(--white);
@@ -1186,7 +1190,16 @@ footer {
   font-weight: 600;
   color: #44514A;
 }
-.trust-badge .icon { font-size: 1.1rem; }
+.trust-badge .icon { display: inline-flex; color: var(--green); flex-shrink: 0; }
+.trust-badge .icon svg { width: 18px; height: 18px; }
+/* Sits under the agreement checkboxes, where the licence number is asked for. */
+.form-privacy-note {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--gray);
+  margin: 1rem 0 0;
+}
+.form-privacy-note a { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .terms-box {
   background: var(--cream);
   border: 1.5px solid var(--cream-dark);
@@ -1276,6 +1289,17 @@ footer {
   flex-shrink: 0;
   margin-top: 2px;
 }
+/* Ticks for the policy bullets. Kept on its own class so the numbered steps
+   on the booking page, which share .req-icon, never get a tick over a digit. */
+.req-tick::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
 .policies-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1291,7 +1315,8 @@ footer {
 .policy-card:nth-child(1) { border-top-color: var(--stripe-red); }
 .policy-card:nth-child(2) { border-top-color: var(--stripe-gold); }
 .policy-card:nth-child(3) { border-top-color: var(--stripe-purple); }
-.policy-card .icon { font-size: 2rem; margin-bottom: 1rem; }
+.policy-card .icon { margin-bottom: 1rem; color: var(--green); }
+.policy-card .icon svg { width: 34px; height: 34px; }
 .policy-card h4 { margin-bottom: 1rem; }
 
 /* ---------- Responsive ---------- */
