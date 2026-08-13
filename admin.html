@@ -493,13 +493,13 @@
               'Right now the site tells renters "we\'ll contact you within 24 hours to arrange the deposit," which is a fine interim step.' },
         { title: 'Email alerts for messages &amp; bookings', status: CONFIG.notify ? 'done' : 'todo',
           body: CONFIG.notify
-            ? ('Working. New messages and booking requests are emailed to <code>' + esc(CONFIG.notify_to || '') + '</code> the moment they come in.')
-            : '<strong>Nothing is being emailed to you right now.</strong> Messages and booking requests are saved here and are safe, but you only see them by opening this dashboard. To get an email the moment one arrives: ' +
+            ? ('Working, through ' + esc(CONFIG.notify_via || 'email') + '. New messages and booking requests are emailed to you the moment they come in.')
+            : '<strong>Nothing is being emailed to you right now.</strong> Messages and booking requests are saved here and are safe, but you only see them by opening this dashboard. Either route below switches it on: ' +
               '<ol>' +
-                '<li>Make a free account at <code>resend.com</code> and add <code>colorwagonrentals.com</code> as a sending domain.</li>' +
-                '<li>In Netlify  Site settings  Environment variables, add <code>RESEND_API_KEY</code> (the key they give you) and <code>NOTIFY_FROM</code> (for example <code>site@colorwagonrentals.com</code>).</li>' +
-                '<li>Redeploy. This row turns green on its own once it is working.</li>' +
-              '</ol>' },
+                '<li><strong>Quickest.</strong> Make a free account at <code>web3forms.com</code> using the address you want the alerts to arrive at, and send your developer the access key. No Netlify settings involved.</li>' +
+                '<li><strong>Or,</strong> for mail sent from your own domain: create a free <code>resend.com</code> account, then in Netlify under Site settings, Environment variables, add <code>RESEND_API_KEY</code> and <code>NOTIFY_FROM</code>.</li>' +
+              '</ol>' +
+              'This row turns green on its own once either one is live.' },
         { title: 'Confirm Wisconsin sales-tax rate', status: 'action',
           body: 'The site currently adds <strong>5.5%</strong> (WI state 5% + Manitowoc County 0.5%) on top of the rental + $50 cleaning fee. Confirm this is correct for your situation; tell your developer if it should change.' },
         { title: 'Set www as the primary domain (optional)', status: onDomain ? 'done' : 'action',

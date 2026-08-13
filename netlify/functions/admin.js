@@ -1,7 +1,7 @@
 // Password-protected admin API for Heidi & Will's dashboard.
 // Requires the ADMIN_PASSWORD environment variable set in Netlify.
 const { getStore, connectLambda } = require('@netlify/blobs');
-const { configured: notifyConfigured } = require('../lib/notify');
+const { configured: notifyConfigured, transport: notifyTransport } = require('../lib/notify');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'method_not_allowed' });
@@ -88,6 +88,7 @@ exports.handler = async (event) => {
     // Whether an incoming message or booking actually reaches an inbox, as
     // opposed to only sitting in here waiting to be noticed.
     notify: notifyConfigured(),
+    notify_via: notifyTransport(),
     notify_to: process.env.NOTIFY_TO || 'ColorWagonRentals@gmail.com'
   };
 
